@@ -1,0 +1,269 @@
+﻿@model System.Data.DataTable
+@using HMS.Utils
+@using System.Web
+@{
+    ViewData["Title"] = "Manage Doctor & Departments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- SweetAlert2 for beautiful popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="~/assets/css/list.css" rel="stylesheet">
+    <style>
+
+        .doctordepartment-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .doctordepartment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--neon-secondary);
+            object-fit: cover;
+        }
+
+        .doctordepartment-name {
+            font-weight: 600;
+            color: var(--text-color-primary);
+        }
+
+        .doctordepartment-email {
+            font-size: 0.9rem;
+        }
+
+        .doctordepartment-specialization {
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .truncate-cell {
+            max-width: 150px; /* You can adjust this value */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 page-header">
+            <h2 class="m-0">Manage Doctor & Department Relation</h2>
+            <div class="d-flex align-items-center mt-3 mt-md-0 action-bar">
+                <button class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                    <i class="bi bi-trash-fill me-1"></i>
+                </button>
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="doctordepartmentSearch" class="form-control" placeholder="Search doctor/departments...">
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end glass-effect" aria-labelledby="exportDropdown">
+                        <li><a class="dropdown-item" asp-action="ExportDoctorDepartments" asp-route-exportType="excel"><i class="bi bi-file-earmark-excel me-2"></i>Export to Excel</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportDoctorDepartments" asp-route-exportType="pdf"><i class="bi bi-file-earmark-pdf me-2"></i>Export to PDF</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportDoctorDepartments" asp-route-exportType="csv"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export to CSV</a></li>
+                    </ul>
+                </div>
+                <a asp-action="DoctorDepartmentAddEdit" asp-controller="DoctorDepartment" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Add 
+                </a>
+            </div>
+        </div>
+
+        <div class="card main-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="text-start">
+                            <tr>
+                                <th class="ps-4 text-center" style="width: 5%;"><input class="form-check-input" type="checkbox" id="selectAllCheckbox"></th>
+                                <th style="width: 35%;">Department</th>
+                                <th style="width: 20%;">Doctor</th>
+                                <th class="text-center" style="width: 15%;">Managed by</th>
+                                <th class="text-center pe-4" style="width: 25%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Rows.Count > 0)
+                            {
+                                var colors = new[] { "#0d6efd", "#6f42c1", "#198754", "#d63384", "#fd7e14", "#20c997" };
+                                var colorIndex = 0;
+
+                                foreach (System.Data.DataRow row in Model.Rows)
+                                {
+
+                                    colorIndex++;
+                                    @* var doctordepartmentId = @UrlEncryptDecrypt.Encrypt(row["DoctorDepartmentID"].ToString()); *@
+                                    var doctordepartmentId = HttpUtility.UrlEncode(UrlEncryptDecrypt.Encrypt(row["DoctorDepartmentID"].ToString()));
+
+                                    var departmentName = row["DepartmentName"].ToString();
+                                    var avatarChar = string.IsNullOrEmpty(departmentName) ? "" : departmentName.Substring(0, 1).ToUpper();
+                                    var avatarBg = colors[colorIndex % colors.Length];
+
+                                    <tr class="clickable-row" style="animation-delay: @(colorIndex * 0.05)s" onclick="window.location.href='@Url.Action("DoctorDepartmentDetail", "DoctorDepartment", new { enDoctorDepartmentID = doctordepartmentId })'">
+                                        <td class="text-center ps-4" onclick="event.stopPropagation();">
+                                            <input class="form-check-input doctordepartment-checkbox" type="checkbox" value="@doctordepartmentId">
+                                        </td>
+                                        <td class="ps-4">
+                                            <div class="doctordepartment-info">
+
+                                                <div class="doctordepartment-avatar" style="background-color:@avatarBg">
+                                                    @avatarChar
+                                                </div>
+                                                <div>
+                                                    <div class="doctordepartment-name">@departmentName</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @row["DoctorName"]
+                                        </td>
+                                        <td>
+                                            @row["UserName"]
+                                        </td>
+                                        <td class="pe-4">
+                                            <div class="action-buttons text-center" onclick="event.stopPropagation();">
+                                                <a class="btn btn-sm btn-outline-primary btn-icon"
+                                                   asp-controller="DoctorDepartment" asp-action="DoctorDepartmentAddEdit" asp-route-enDoctorDepartmentID="@doctordepartmentId"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-outline-danger btn-icon"
+                                                   href="javascript:void(0);"
+                                                   onclick="confirmDelete('@doctordepartmentId')"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="bi bi-person-rolodex"></i>
+                                            <h5>No DoctorDepartments Found</h5>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        <script>
+            // --- Razor to sessionStorage Bridge ---
+            @{
+                                                                                var successMessage = TempData["SuccessMessage"]?.ToString();
+                                                                                var errorMessage = TempData["ErrorMessage"]?.ToString();
+                                                                                if (!string.IsNullOrEmpty(successMessage))
+                                                                                {
+                                                                                                                                            <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                                                                            }
+                                                                                if (!string.IsNullOrEmpty(errorMessage))
+                                                                                {
+
+                                                                                                                                                <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                                                                                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); const popup = Swal.getPopup(); if(popup){ popup.style.background='var(--glass-bg)'; popup.style.backdropFilter='blur(10px)'; popup.style.border='1px solid var(--glass-border)'; popup.style.color='var(--text-color-primary)'; } } });
+                const successMsg = sessionStorage.getItem('hms_successMessage'); if (successMsg) { Toast.fire({ icon: 'success', title: successMsg }); sessionStorage.removeItem('hms_successMessage'); }
+                const errorMsg = sessionStorage.getItem('hms_errorMessage'); if (errorMsg) { Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMsg }); sessionStorage.removeItem('hms_errorMessage'); }
+
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+
+                document.getElementById('doctordepartmentSearch').addEventListener('keyup', function() {
+                    let filter = this.value.toLowerCase();
+                    document.querySelectorAll('tbody tr.clickable-row').forEach(row => {
+                        let name = row.querySelector('.doctordepartment-name').textContent.toLowerCase();
+                        let email = row.querySelector('.doctordepartment-email').textContent.toLowerCase();
+                        row.style.display = (name.includes(filter) || email.includes(filter)) ? '' : 'none';
+                    });
+                });
+
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                const doctordepartmentCheckboxes = document.querySelectorAll('.doctordepartment-checkbox');
+                const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+                function toggleDeleteButton() {
+                    const checkedCount = document.querySelectorAll('.doctordepartment-checkbox:checked').length;
+                    deleteSelectedBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                }
+
+                selectAllCheckbox.addEventListener('change', (e) => {
+                    doctordepartmentCheckboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+                    toggleDeleteButton();
+                });
+
+                doctordepartmentCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        selectAllCheckbox.checked = [...doctordepartmentCheckboxes].every(c => c.checked);
+                        toggleDeleteButton();
+                    });
+                });
+
+                deleteSelectedBtn.addEventListener('click', () => {
+                    const selectedIds = [...doctordepartmentCheckboxes].filter(c => c.checked).map(c => c.value);
+                    Swal.fire({ title: 'Delete Selected DoctorDepartments?', text: `You are about to delete ${selectedIds.length} doctordepartments.`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete them!' })
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '@Url.Action("DeleteSelectedDoctorDepartments", "DoctorDepartment")';
+                                selectedIds.forEach(id => {
+                                    const input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = 'selectedDoctorDepartmentIds';
+                                    input.value = id;
+                                    form.appendChild(input);
+                                });
+                                document.body.appendChild(form);
+                                form.submit();
+                            }
+                        });
+                });
+            });
+
+            function confirmDelete(doctordepartmentId) {
+                Swal.fire({ title: 'Are you sure?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!' })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '@Url.Action("DoctorDepartmentDelete", "DoctorDepartment")?enDoctorDepartmentID=' + doctordepartmentId;
+                        }
+                    });
+            }
+        </script>
+    }
+</body>
+</html>

@@ -1,0 +1,316 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>@ViewData["Title"] - HeathCore</title>
+
+    <meta content="Hospital Management System" name="description">
+    <meta content="HMS, Hospital, Management" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/main-logo.png" rel="icon">
+    <link href="~/assets/img/main-logo.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Main Stylesheet with Theme Variables -->
+    <style>
+        /* ===================================================================
+                                           LOGIN LAYOUT STYLES - LIGHT THEME ONLY
+                                           - Refined for a cleaner, more professional aesthetic.
+                                           =================================================================== */
+
+        :root {
+            --font-primary: 'Poppins', sans-serif;
+            --font-secondary: 'Roboto Mono', monospace;
+            --transition-speed: 0.3s;
+            --bg-color: #f0f4ff;
+            --bg-gradient: linear-gradient(135deg, #e6f0ff 0%, #d4e4ff 100%);
+            --text-color-primary: #011a4b;
+            --text-color-secondary: #5a6a8a;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(200, 210, 230, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --neon-primary: #0d6efd;
+            --neon-secondary: #00c9a7; /* A more professional teal */
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-color-primary);
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        a {
+            color: var(--neon-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            a:hover {
+                color: var(--neon-secondary);
+            }
+
+        /* --- Refined Login Card --- */
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; /* Softer radius */
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.6s ease-out;
+            padding: 1rem; /* Added padding for internal spacing */
+        }
+
+        .logo span {
+            color: var(--text-color-primary);
+            font-family: var(--font-secondary);
+            text-shadow: 0 0 5px rgba(13, 110, 253, 0.3);
+        }
+
+        .card-title {
+            color: var(--text-color-primary);
+        }
+
+        .form-label {
+            color: var(--text-color-secondary);
+            font-weight: 500;
+        }
+
+        /* --- VASTLY IMPROVED FORM CONTROLS --- */
+        .input-group {
+            border-radius: 12px; /* Rounded group */
+            border: 1px solid var(--glass-border);
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: all var(--transition-speed);
+        }
+
+            .input-group:focus-within {
+                border-color: var(--neon-primary);
+                box-shadow: 0 0 10px var(--neon-primary);
+            }
+
+        .themed-input-group-text {
+            background: transparent;
+            border: none;
+            color: var(--text-color-secondary);
+            font-size: 1.1rem;
+        }
+
+        .form-control-themed {
+            background: transparent;
+            border: none;
+            color: var(--text-color-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+        }
+
+            .form-control-themed:focus {
+                box-shadow: none; /* Shadow is on the parent group now */
+            }
+
+        /* Button inside input group */
+        .input-group > .btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color-secondary);
+        }
+
+            .input-group > .btn:hover {
+                color: var(--neon-primary);
+            }
+
+            .input-group > .btn:focus {
+                box-shadow: none;
+            }
+
+        .btn-primary {
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+            transition: all var(--transition-speed);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+            }
+
+        /* --- Refined Toggle Switch --- */
+        .form-switch-themed {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-left: 0;
+        }
+
+            .form-switch-themed .form-check-input {
+                width: 3.25em;
+                height: 1.6em;
+                cursor: pointer;
+                background-color: rgba(0, 0, 0, 0.1);
+                border-color: var(--glass-border);
+            }
+
+                .form-switch-themed .form-check-input:checked {
+                    background-color: var(--neon-secondary);
+                    border-color: var(--neon-secondary);
+                }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Script to set dark/light theme based on user preference -->
+
+    <script>
+        //     (function() {
+        //         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        //         if (prefersDark) {
+        //             document.body.setAttribute('data-theme', 'dark');
+        //         }
+        //     })();
+        // </script>
+
+    <!-- Particle background container -->
+    <div id="particles-js"></div>
+
+    @RenderBody()
+
+    <!-- Vendor JS Files -->
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Particle.js for background effect -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        // Standard Particles.js config - you can use the enhanced one from your main _Layout if you prefer
+
+        particlesJS('particles-js', {
+                    "particles": {
+                        "number": {
+                            "value": 100,
+                            "density": { "enable": true, "value_area": 500 }
+                        },
+                        "color": {
+                            "value": "#8b949e"
+                        },
+                        "shape": {
+                            "type": ["star", "circle", "triangle", "square", "polygon",  "edge"], // More shapes
+                            "stroke": { "width": 1, "color": "#8b949e" },
+                            "polygon": { "nb_sides": 6 }, // Hexagon
+                            "star": { "nb_sides": 5 },
+                            "image": { "width": 100, "height": 100 }
+                        },
+                        "opacity": {
+                            "value": 0.7,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 2,
+                                "opacity_min": 0.2,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 5,
+                            "random": true,
+                            "anim": { "enable": true, "speed": 5, "size_min": 0.1, "sync": false }
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 150,
+                            "color": "#8b949e",
+                            "opacity": 0.5,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 3,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "bounce",
+                            "bounce": true,
+                            "attract": {
+                                "enable": true,
+                                "rotateX": 600,
+                                "rotateY": 600
+                            }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": {
+                            "onhover": { "enable": true, "mode": ["grab", "bubble"] }, // Bubble effect on hover
+                            "onclick": { "enable": true, "mode": "push" },
+                            "resize": true
+                        },
+                        "modes": {
+                            "grab": {
+                                "distance": 250,
+                                "line_linked": {
+                                    "opacity": 0.5,
+                                    "color": "#8b949e"
+                                }
+                            },
+                            "bubble": {
+                                "distance":300,
+                                "size": 10,
+                                "duration": 2,
+                                "opacity": 1,
+                                "speed": 3
+                            },
+                            "push": {
+                                "particles_nb": 1
+                            },
+                            "repulse": {
+                                "distance": 150,
+                                "duration": 1.2
+                            },
+                            "remove": {
+                                "particles_nb": 1,
+                                "duration": 0.4
+                            }
+                        }
+
+                    },
+                    "retina_detect": true
+                });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

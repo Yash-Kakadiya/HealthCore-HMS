@@ -1,0 +1,192 @@
+﻿@model DoctorDepartmentModel
+@using HMS.Utils
+@using System.Web
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.DoctorDepartmentID == 0 ? "Assign Doctor to Department" : "Edit Doctor Assignment";
+}
+@*
+    Model Properties for reference:
+    public int DoctorDepartmentID { get; set; }
+    public int DoctorID { get; set; }
+    public int DepartmentID { get; set; }
+    public int UserID { get; set; }
+*@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <!-- SweetAlert2 for beautiful popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Styles copied from the approved DepartmentAddEdit.cshtml for perfect consistency */
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card-header-custom {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header-custom h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--text-color-primary);
+                text-shadow: 0 0 8px var(--neon-primary);
+            }
+
+        /* Themed form controls */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all var(--transition-speed);
+        }
+
+            .form-control::placeholder {
+                color: var(--text-color-secondary);
+                opacity: 0.7;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background: var(--glass-bg);
+                border-color: var(--neon-primary);
+                box-shadow: 0 0 10px var(--neon-primary);
+                color: var(--text-color-primary);
+            }
+
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='var(--text-color-secondary)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+        }
+
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .card-footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <div class="card main-card col-xl-8 mx-auto">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-person-badge-fill me-2"></i> @ViewData["Title"]</h5>
+                <a asp-action="DoctorDepartmentList" asp-controller="DoctorDepartment" class="btn btn-sm btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form id="doctorDepartmentForm" method="post" asp-controller="DoctorDepartment" asp-action="DoctorDepartmentAddEdit">
+                    <input type="hidden" asp-for="DoctorDepartmentID" />
+
+                    <!-- Using a reliable Bootstrap row/col grid -->
+                    <div class="row g-4">
+                        <div class="col-md-6 form-group" style="animation-delay: 0.1s;">
+                            <label asp-for="DoctorID" class="form-label">Select Doctor</label>
+                            <select asp-for="DoctorID" class="form-select" asp-items="@(new SelectList(ViewBag.DoctorList, "DoctorID", "DoctorName"))" required>
+                                <option value="" selected disabled>-- Select Doctor --</option>
+                            </select>
+                            <span asp-validation-for="DoctorID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group" style="animation-delay: 0.2s;">
+                            <label asp-for="DepartmentID" class="form-label">Assign to Department</label>
+                            <select asp-for="DepartmentID" class="form-select" asp-items="@(new SelectList(ViewBag.DepartmentList, "DepartmentID", "DepartmentName"))" required>
+                                <option value="" selected disabled>-- Select Department --</option>
+                            </select>
+                            <span asp-validation-for="DepartmentID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 form-group" style="animation-delay: 0.3s;">
+                            <label asp-for="UserID" class="form-label">Record Managed By</label>
+                            <select asp-for="UserID" class="form-select" asp-items="@(new SelectList(ViewBag.UserList, "UserID", "UserName"))" required>
+                                <option value="" selected disabled>-- Select User --</option>
+                            </select>
+                            <span asp-validation-for="UserID" class="text-danger"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- --- Form Footer with Actions --- -->
+            <div class="card-footer-actions">
+                <a asp-action="DoctorDepartmentList" asp-controller="DoctorDepartment" class="btn btn-secondary">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </a>
+                <button type="submit" form="doctorDepartmentForm" class="btn btn-primary">
+                    <i class="bi bi-check2-circle me-1"></i> @(Model.DoctorDepartmentID == 0 ? "Assign" : "Save Changes")
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // This Razor block moves TempData to sessionStorage to prevent the back-button bug.
+            @{
+                        var successMessage = TempData["SuccessMessage"]?.ToString();
+                        var errorMessage = TempData["ErrorMessage"]?.ToString();
+                        if (!string.IsNullOrEmpty(successMessage))
+                        {
+                                    <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                        }
+                        if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                                    <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                        }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // --- SWEETALERT & MESSAGE HANDLING ---
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); const popup = Swal.getPopup(); if(popup){ popup.style.background='var(--glass-bg)'; popup.style.backdropFilter='blur(10px)'; popup.style.border='1px solid var(--glass-border)'; popup.style.color='var(--text-color-primary)'; } } });
+                const successMsg = sessionStorage.getItem('hms_successMessage'); if (successMsg) { Toast.fire({ icon: 'success', title: successMsg }); sessionStorage.removeItem('hms_successMessage'); }
+                const errorMsg = sessionStorage.getItem('hms_errorMessage'); if (errorMsg) { Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMsg }); sessionStorage.removeItem('hms_errorMessage'); }
+            });
+        </script>
+    }
+</body>
+</html>

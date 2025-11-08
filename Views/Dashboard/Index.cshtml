@@ -1,0 +1,1957 @@
+﻿@model HMS.Models.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section HeadScripts {
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.0/dist/apexcharts.min.js"></script>
+    <style>
+        /* Dashboard Enhanced Styles */
+        .dashboard-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animated Gradient Background for Cards */
+        .gradient-card {
+            background: linear-gradient(135deg, var(--neon-primary) 0%, var(--neon-secondary) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .gradient-card::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                bottom: -50%;
+                left: -50%;
+                background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+                transform: rotate(45deg) translate(-50%, -50%);
+                animation: shimmer 3s infinite;
+            }
+
+        @@keyframes shimmer {
+            0%, 100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        /* Enhanced Metric Cards */
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .metric-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+                border-color: var(--neon-primary);
+            }
+
+            .metric-card::after {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, var(--neon-primary), var(--neon-secondary), var(--neon-primary));
+                border-radius: 20px;
+                opacity: 0;
+                z-index: -1;
+                transition: opacity 0.3s ease;
+            }
+
+            .metric-card:hover::after {
+                opacity: 0.3;
+            }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+            .metric-icon i {
+                z-index: 1;
+            }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-color-primary);
+            margin-bottom: 8px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+            .metric-change.positive {
+                color: #10b981;
+            }
+
+            .metric-change.negative {
+                color: #ef4444;
+            }
+
+        /* Performance Ring */
+        .performance-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .performance-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color-primary);
+        }
+
+        /* Activity Timeline */
+        .activity-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+            .activity-timeline::before {
+                content: '';
+                position: absolute;
+                left: 9px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(180deg, var(--neon-primary) 0%, transparent 100%);
+            }
+
+        .activity-item {
+            position: relative;
+            padding-bottom: 30px;
+            animation: slideInLeft 0.5s ease-out backwards;
+        }
+
+            .activity-item:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .activity-item:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .activity-item:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .activity-item:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            .activity-item:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+
+        @@keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-dot {
+            position: absolute;
+            left: -21px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--neon-primary);
+            border: 2px solid var(--bg-color);
+            box-shadow: 0 0 10px var(--neon-primary);
+        }
+
+        .activity-content {
+            background: var(--glass-bg);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+            margin-bottom: 4px;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: var(--text-color-primary);
+            margin-bottom: 4px;
+        }
+
+        .activity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(var(--neon-primary-rgb), 0.1);
+            color: var(--neon-primary);
+        }
+
+        /* Department Cards */
+        .department-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .department-card:hover {
+                transform: translateY(-3px);
+                border-color: var(--neon-primary);
+            }
+
+        .department-icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 24px;
+        }
+
+        .department-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .department-stat {
+            flex: 1;
+        }
+
+        .department-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color-primary);
+        }
+
+        .department-stat-label {
+            font-size: 11px;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Top Doctors List */
+        .doctor-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+            .doctor-card:hover {
+                transform: translateX(5px);
+                border-color: var(--neon-primary);
+            }
+
+        .doctor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .doctor-info {
+            flex: 1;
+        }
+
+        .doctor-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-color-primary);
+            margin-bottom: 4px;
+        }
+
+        .doctor-specialty {
+            font-size: 13px;
+            color: var(--text-color-secondary);
+        }
+
+        .doctor-stats {
+            text-align: right;
+        }
+
+        .doctor-appointments {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color-primary);
+        }
+
+        .doctor-revenue {
+            font-size: 13px;
+            color: var(--neon-primary);
+            font-weight: 500;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            border-color: var(--neon-primary);
+            box-shadow: var(--neon-glow-primary);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color-primary);
+            margin-bottom: 4px;
+        }
+
+        .chart-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-color-secondary);
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .chart-action-btn:hover,
+            .chart-action-btn.active {
+                background: var(--neon-primary);
+                color: white;
+                border-color: var(--neon-primary);
+            }
+
+        /* Quick Stats Grid */
+        .quick-stat {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+            padding: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+            .quick-stat:hover {
+                transform: scale(1.05);
+                border-color: var(--neon-primary);
+            }
+
+        .quick-stat-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--neon-primary);
+        }
+
+        .quick-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color-primary);
+            margin-bottom: 4px;
+        }
+
+        .quick-stat-label {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Appointment Cards */
+        .appointment-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .appointment-card::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: var(--neon-primary);
+            }
+
+            .appointment-card:hover {
+                transform: translateX(5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }
+
+        .appointment-time-block {
+            background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 70px;
+        }
+
+            .appointment-time-block .time {
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .appointment-time-block .period {
+                font-size: 11px;
+                opacity: 0.9;
+            }
+
+        .appointment-details {
+            flex: 1;
+        }
+
+        .appointment-patient {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-color-primary);
+            margin-bottom: 4px;
+        }
+
+        .appointment-doctor {
+            font-size: 13px;
+            color: var(--text-color-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .appointment-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+            .appointment-status.pending {
+                background: rgba(251, 191, 36, 0.1);
+                color: #f59e0b;
+            }
+
+            .appointment-status.confirmed {
+                background: rgba(16, 185, 129, 0.1);
+                color: #10b981;
+            }
+
+            .appointment-status.cancelled {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+            }
+
+        /* Loading Animation */
+        .skeleton {
+            animation: skeleton-loading 1s linear infinite alternate;
+        }
+
+        @@keyframes skeleton-loading {
+            0% {
+                background-color: hsl(200, 20%, 80%);
+            }
+
+            100% {
+                background-color: hsl(200, 20%, 95%);
+            }
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .metric-value {
+                font-size: 28px;
+            }
+
+            .metric-label {
+                font-size: 12px;
+            }
+
+            .chart-container {
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid var(--glass-border);
+                padding: 16px;
+            }
+        }
+
+        /* Dark Theme Adjustments */
+        [data-theme="dark"] .metric-card {
+            background: rgba(13, 17, 23, 0.8);
+        }
+
+        [data-theme="dark"] .activity-content {
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        [data-theme="dark"] .department-card {
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        [data-theme="dark"] .doctor-card {
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        [data-theme="dark"] .appointment-card {
+            background: rgba(13, 17, 23, 0.6);
+        }
+
+        /* Pulse Animation */
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Neon Glow Effect */
+        .neon-glow {
+            box-shadow: 0 0 20px var(--neon-primary);
+        }
+
+        /* Counter Animation */
+        .counter {
+            display: inline-block;
+        }
+    </style>
+}
+
+<div class="dashboard-container">
+    <!-- Enhanced Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center glass-effect p-4">
+                <div>
+                    <h1 class="mb-2" style="font-size: 2.5rem; font-weight: 700; color: var(--text-color-primary); text-shadow: var(--neon-glow-primary);">
+                        Welcome back, @Context.Session.GetString("UserName")! 👋
+                    </h1>
+                    <p style="color: var(--text-color-secondary); font-size: 1.1rem;">
+                        Here's your hospital dashboard overview
+                    </p>
+                </div>
+                <div class="text-end">
+                    <div style="font-size: 1.25rem; font-weight: 600; color: var(--neon-primary);">
+                        @DateTime.Now.ToString("dddd")
+                    </div>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--text-color-primary);">
+                        @DateTime.Now.ToString("MMMM dd, yyyy")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class='bx bx-user-plus' style="color: white;"></i>
+                </div>
+                <div class="metric-value counter" data-target="@Model.TotalPatients">0</div>
+                <div class="metric-label">Total Patients</div>
+                <div class="metric-change positive">
+                    <i class='bx bx-trending-up'></i>
+                    <span>+@Model.NewPatientsThisMonth this month</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class='bx bx-calendar-check' style="color: white;"></i>
+                </div>
+                <div class="metric-value counter" data-target="@Model.TotalAppointmentsThisMonth">0</div>
+                <div class="metric-label">Monthly Appointments</div>
+                <div class="metric-change positive">
+                    <i class='bx bx-trending-up'></i>
+                    <span>@Model.CompletionRate.ToString("0.0")% completion</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class='bx bx-dollar-circle' style="color: white;"></i>
+                </div>
+                <div class="metric-value">₹<span class="counter" data-target="@((int)Model.TotalRevenueThisMonth)">0</span></div>
+                <div class="metric-label">Monthly Revenue</div>
+                <div class="metric-change positive">
+                    <i class='bx bx-trending-up'></i>
+                    <span>+@Model.RevenueGrowthPercentage.ToString("0.0")% growth</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class='bi bi-person-gear' style="color: white;"></i>
+                </div>
+                <div class="metric-value counter" data-target="@Model.TotalDoctors">0</div>
+                <div class="metric-label">Active Doctors</div>
+                <div class="metric-change positive">
+                    <i class='bx bx-check-circle'></i>
+                    <span>@Model.OccupancyRate.ToString("0.0")% occupancy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-calendar-event'></i>
+                </div>
+                <div class="quick-stat-value counter" data-target="@Model.TodayAppointments">0</div>
+                <div class="quick-stat-label">Today</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-time-five'></i>
+                </div>
+                <div class="quick-stat-value counter" data-target="@Model.PendingAppointmentsThisMonth">0</div>
+                <div class="quick-stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-check-circle'></i>
+                </div>
+                <div class="quick-stat-value counter" data-target="@Model.CompletedAppointmentsThisMonth">0</div>
+                <div class="quick-stat-label">Completed</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-x-circle'></i>
+                </div>
+                <div class="quick-stat-value counter" data-target="@Model.CancelledAppointmentsThisMonth">0</div>
+                <div class="quick-stat-label">Cancelled</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-user-plus'></i>
+                </div>
+                <div class="quick-stat-value counter" data-target="@Model.NewPatientsThisWeek">0</div>
+                <div class="quick-stat-label">New This Week</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="quick-stat">
+                <div class="quick-stat-icon">
+                    <i class='bx bx-rupee'></i>
+                </div>
+                <div class="quick-stat-value">₹<span class="counter" data-target="@((int)Model.AverageConsultationFee)">0</span></div>
+                <div class="quick-stat-label">Avg Fee</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Appointment Trends Chart -->
+        <div class="col-12 col-xl-8">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Appointment Trends</div>
+                        <div class="chart-subtitle">Daily appointment statistics for @DateTime.Now.ToString("MMMM yyyy")</div>
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn active" onclick="updateAppointmentChart('month')">Month</button>
+                        <button class="chart-action-btn" onclick="updateAppointmentChart('week')">Week</button>
+                        <button class="chart-action-btn" onclick="refreshAppointmentChart()">
+                            <i class='bx bx-refresh'></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="appointmentTrendsChart" style="height: 350px;"></div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="col-12 col-xl-4">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Performance Metrics</div>
+                        <div class="chart-subtitle">Key performance indicators</div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div id="completionRateChart" style="height: 140px;"></div>
+                            <div class="mt-2">
+                                <div style="font-size: 14px; font-weight: 600; color: var(--text-color-primary);">Completion Rate</div>
+                                <div style="font-size: 12px; color: var(--text-color-secondary);">This Month</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div id="occupancyRateChart" style="height: 140px;"></div>
+                            <div class="mt-2">
+                                <div style="font-size: 14px; font-weight: 600; color: var(--text-color-primary);">Occupancy Rate</div>
+                                <div style="font-size: 12px; color: var(--text-color-secondary);">Current Status</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span style="font-size: 13px; color: var(--text-color-secondary);">Cancellation Rate</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #ef4444;">@Model.CancellationRate.ToString("0.0")%</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 3px;">
+                        <div class="progress-bar" style="width: @Model.CancellationRate%; background: #ef4444;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Performance & Revenue Distribution -->
+    <div class="row g-4 mb-4">
+        <!-- Department Performance -->
+        <div class="col-12 col-xl-7">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Department Performance</div>
+                        <div class="chart-subtitle">Revenue and patient distribution by department</div>
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn active" onclick="updateDepartmentChart('revenue')">Revenue</button>
+                        <button class="chart-action-btn" onclick="updateDepartmentChart('patients')">Patients</button>
+                    </div>
+                </div>
+                <div id="departmentPerformanceChart" style="height: 320px;"></div>
+            </div>
+        </div>
+
+        <!-- Age Distribution -->
+        <div class="col-12 col-xl-5">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Patient Demographics</div>
+                        <div class="chart-subtitle">Age group distribution</div>
+                    </div>
+                </div>
+                <div id="ageDistributionChart" style="height: 320px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departments Overview -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Department Overview</div>
+                        <div class="chart-subtitle">Statistics by department</div>
+                    </div>
+                    <a asp-controller="Department" asp-action="DepartmentList" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
+                        View All <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                </div>
+                <div class="row g-3 mt-2">
+                    @if (Model.DepartmentStats != null && Model.DepartmentStats.Any())
+                    {
+                        @foreach (var dept in Model.DepartmentStats.Take(6))
+                        {
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="department-card">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="department-icon-wrapper" style="background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));">
+                                            <i class='bx @GetDepartmentIcon(dept.DepartmentName)' style="color: white;"></i>
+                                        </div>
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 20px;">Active</span>
+                                    </div>
+                                    <h6 style="font-size: 16px; font-weight: 600; color: var(--text-color-primary); margin-bottom: 4px;">@dept.DepartmentName</h6>
+                                    <div class="department-stats">
+                                        <div class="department-stat">
+                                            <div class="department-stat-value">@dept.DoctorCount</div>
+                                            <div class="department-stat-label">Doctors</div>
+                                        </div>
+                                        <div class="department-stat">
+                                            <div class="department-stat-value">@dept.PatientCount</div>
+                                            <div class="department-stat-label">Patients</div>
+                                        </div>
+                                        <div class="department-stat">
+                                            <div class="department-stat-value">₹@(dept.DepartmentRevenue > 1000 ? (dept.DepartmentRevenue / 1000).ToString("0.0") + "K" : dept.DepartmentRevenue.ToString("0"))</div>
+                                            <div class="department-stat-label">Revenue</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row: Activity, Top Doctors, Upcoming Appointments -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Activity Timeline -->
+        <div class="col-12 col-lg-4">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Recent Activity</div>
+                        <div class="chart-subtitle">Latest system activities</div>
+                    </div>
+                </div>
+                <div class="activity-timeline mt-3">
+                    @if (Model.RecentActivities != null && Model.RecentActivities.Any())
+                    {
+                        @foreach (var activity in Model.RecentActivities.Take(5))
+                        {
+                            <div class="activity-item">
+                                <div class="activity-dot"></div>
+                                <div class="activity-content">
+                                    <div class="activity-time">@activity.ActivityDate.ToString("MMM dd, HH:mm")</div>
+                                    <div class="activity-text">@activity.Description</div>
+                                    <span class="activity-badge">@activity.Action</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class='bx bx-calendar-x' style="font-size: 48px; color: var(--text-color-secondary);"></i>
+                            <p style="color: var(--text-color-secondary); margin-top: 12px;">No recent activities</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performing Doctors -->
+        <div class="col-12 col-lg-4">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Top Performing Doctors</div>
+                        <div class="chart-subtitle">Based on appointments this month</div>
+                    </div>
+                    <a asp-controller="Doctor" asp-action="DoctorList" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
+                        View All <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                </div>
+                <div class="mt-3">
+                    @if (Model.TopDoctors != null && Model.TopDoctors.Any())
+                    {
+                        @foreach (var doctor in Model.TopDoctors)
+                        {
+                            <div class="doctor-card">
+                                <div class="doctor-avatar">
+                                    @doctor.DoctorName.Substring(0, 1)
+                                </div>
+                                <div class="doctor-info">
+                                    <div class="doctor-name">@doctor.DoctorName</div>
+                                    <div class="doctor-specialty">@doctor.DepartmentName</div>
+                                </div>
+                                <div class="doctor-stats">
+                                    <div class="doctor-appointments">@doctor.AppointmentCount</div>
+                                    <div class="doctor-revenue">₹@doctor.TotalRevenue.ToString("N0")</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class='bx bx-user-x' style="font-size: 48px; color: var(--text-color-secondary);"></i>
+                            <p style="color: var(--text-color-secondary); margin-top: 12px;">No data available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="col-12 col-lg-4">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Upcoming Appointments</div>
+                        <div class="chart-subtitle">Next scheduled appointments</div>
+                    </div>
+                    <a asp-controller="Appointment" asp-action="AppointmentList" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
+                        View All <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                </div>
+                <div class="mt-3">
+                    @if (Model.RecentAppointments != null && Model.RecentAppointments.Any())
+                    {
+                        @foreach (var appt in Model.RecentAppointments)
+                        {
+                            <div class="appointment-card">
+                                <div class="appointment-time-block">
+                                    <div class="time">@appt.AppointmentDate.ToString("HH:mm")</div>
+                                    <div class="period">@appt.AppointmentDate.ToString("MMM dd")</div>
+                                </div>
+                                <div class="appointment-details">
+                                    <div class="appointment-patient">@appt.PatientName</div>
+                                    <div class="appointment-doctor">
+                                        <i class='bi bi-person-gear'></i> @appt.DoctorName • @appt.DepartmentName
+                                    </div>
+                                </div>
+                                <span class="appointment-status @appt.AppointmentStatus.ToLower()">
+                                    @appt.AppointmentStatus
+                                </span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class='bx bx-calendar-x' style="font-size: 48px; color: var(--text-color-secondary);"></i>
+                            <p style="color: var(--text-color-secondary); margin-top: 12px;">No upcoming appointments</p>
+                            <a asp-controller="Appointment" asp-action="AppointmentAddEdit" class="btn btn-primary btn-sm mt-3" style="border-radius: 8px;">
+                                <i class='bx bx-plus'></i> Schedule New
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Analytics Row -->
+    <div class="row g-4 mb-4">
+        <!-- Hourly Distribution Heatmap -->
+        <div class="col-12 col-xl-6">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Appointment Heatmap</div>
+                        <div class="chart-subtitle">Hourly distribution pattern</div>
+                    </div>
+                </div>
+                <div id="hourlyHeatmapChart" style="height: 280px;"></div>
+            </div>
+        </div>
+
+        <!-- Revenue Breakdown -->
+        <div class="col-12 col-xl-6">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Revenue Analysis</div>
+                        <div class="chart-subtitle">Monthly revenue breakdown</div>
+                    </div>
+                </div>
+                <div id="revenueBreakdownChart" style="height: 280px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly Comparison -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Yearly Overview</div>
+                        <div class="chart-subtitle">Month-by-month comparison for @DateTime.Now.Year</div>
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-action-btn active" onclick="updateYearlyChart('appointments')">Appointments</button>
+                        <button class="chart-action-btn" onclick="updateYearlyChart('revenue')">Revenue</button>
+                        <button class="chart-action-btn" onclick="updateYearlyChart('patients')">Patients</button>
+                    </div>
+                </div>
+                <div id="yearlyComparisonChart" style="height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Quick Actions</div>
+                        <div class="chart-subtitle">Frequently used features</div>
+                    </div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Patient" asp-action="PatientAddEdit" class="text-decoration-none">
+                            <div class="quick-stat">
+                                <div class="quick-stat-icon">
+                                    <i class='bx bx-user-plus'></i>
+                                </div>
+                                <div class="quick-stat-label">Add Patient</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Appointment" asp-action="AppointmentAddEdit" class="text-decoration-none">
+                            <div class="quick-stat">
+                                <div class="quick-stat-icon">
+                                    <i class='bx bx-calendar-plus'></i>
+                                </div>
+                                <div class="quick-stat-label">New Appointment</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Doctor" asp-action="DoctorAddEdit" class="text-decoration-none">
+                            <div class="quick-stat">
+                                <div class="quick-stat-icon">
+                                    <i class='bi bi-person-gear'></i>
+                                </div>
+                                <div class="quick-stat-label">Add Doctor</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Department" asp-action="DepartmentAddEdit" class="text-decoration-none">
+                            <div class="quick-stat">
+                                <div class="quick-stat-icon">
+                                    <i class='bi bi-diagram-3'></i>
+                                </div>
+                                <div class="quick-stat-label">Add Department</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animate counters
+            animateCounters();
+
+            // Initialize all charts
+            initializeAppointmentTrendsChart();
+            initializePerformanceCharts();
+            initializeDepartmentPerformanceChart();
+            initializeAgeDistributionChart();
+            initializeHourlyHeatmap();
+            initializeRevenueBreakdown();
+            initializeYearlyComparison();
+
+            // Set up auto-refresh
+            setInterval(() => {
+                refreshDashboardData();
+            }, 300000); // Refresh every 5 minutes
+        });
+
+        // Counter Animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200;
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const increment = target / speed;
+
+                const updateCount = () => {
+                    const count = +counter.innerText;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + increment);
+                        setTimeout(updateCount, 1);
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                    }
+                };
+
+                updateCount();
+            });
+        }
+
+        // Appointment Trends Chart
+        function initializeAppointmentTrendsChart() {
+            fetch('/Dashboard/GetAppointmentChartData')
+                .then(response => response.json())
+                .then(data => {
+                    const options = {
+                        series: [
+                            {
+                                name: 'Scheduled',
+                                type: 'area',
+                                data: data.scheduled
+                            },
+                            {
+                                name: 'Completed',
+                                type: 'line',
+                                data: data.completed
+                            },
+                            {
+                                name: 'Cancelled',
+                                type: 'line',
+                                data: data.cancelled
+                            }
+                        ],
+                        chart: {
+                            height: 350,
+                            type: 'line',
+                            toolbar: {
+                                show: true,
+                                tools: {
+                                    download: true,
+                                    selection: false,
+                                    zoom: true,
+                                    zoomin: true,
+                                    zoomout: true,
+                                    pan: false,
+                                    reset: true
+                                }
+                            },
+                            animations: {
+                                enabled: true,
+                                easing: 'easeinout',
+                                speed: 800
+                            }
+                        },
+                        colors: ['#667eea', '#10b981', '#ef4444'],
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: [0, 3, 2]
+                        },
+                        fill: {
+                            type: ['gradient', 'solid', 'solid'],
+                            gradient: {
+                                shadeIntensity: 1,
+                                opacityFrom: 0.4,
+                                opacityTo: 0.1,
+                                stops: [0, 90, 100]
+                            }
+                        },
+                        xaxis: {
+                            categories: data.days,
+                            title: {
+                                text: 'Day of Month'
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Number of Appointments'
+                            }
+                        },
+                        tooltip: {
+                            shared: true,
+                            intersect: false,
+                            theme: 'dark'
+                        },
+                        grid: {
+                            borderColor: '#e0e0e0',
+                            strokeDashArray: 4
+                        },
+                        legend: {
+                            position: 'top',
+                            horizontalAlign: 'right'
+                        }
+                    };
+
+                    const chart = new ApexCharts(document.querySelector("#appointmentTrendsChart"), options);
+                    chart.render();
+                    window.appointmentTrendsChart = chart;
+                });
+        }
+
+        // Performance Charts (Radial)
+        function initializePerformanceCharts() {
+            // Completion Rate Chart
+            const completionOptions = {
+                series: [@Model.CompletionRate],
+                chart: {
+                    height: 140,
+                    type: 'radialBar',
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -90,
+                        endAngle: 90,
+                        track: {
+                            background: "#e7e7e7",
+                            strokeWidth: '97%',
+                            margin: 5,
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 0,
+                                color: '#999',
+                                opacity: 1,
+                                blur: 2
+                            }
+                        },
+                        dataLabels: {
+                            show: true,
+                            name: {
+                                show: false
+                            },
+                            value: {
+                                offsetY: -2,
+                                fontSize: '22px',
+                                fontWeight: '600',
+                                formatter: function (val) {
+                                    return val + "%";
+                                }
+                            }
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        shadeIntensity: 0.4,
+                        inverseColors: false,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 50, 53, 91]
+                    }
+                },
+                colors: ['#10b981']
+            };
+
+            const completionChart = new ApexCharts(document.querySelector("#completionRateChart"), completionOptions);
+            completionChart.render();
+
+            // Occupancy Rate Chart
+            const occupancyOptions = {
+                series: [@Model.OccupancyRate],
+                chart: {
+                    height: 140,
+                    type: 'radialBar',
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -90,
+                        endAngle: 90,
+                        track: {
+                            background: "#e7e7e7",
+                            strokeWidth: '97%',
+                            margin: 5,
+                            dropShadow: {
+                                enabled: true,
+                                top: 2,
+                                left: 0,
+                                color: '#999',
+                                opacity: 1,
+                                blur: 2
+                            }
+                        },
+                        dataLabels: {
+                            show: true,
+                            name: {
+                                show: false
+                            },
+                            value: {
+                                offsetY: -2,
+                                fontSize: '22px',
+                                fontWeight: '600',
+                                formatter: function (val) {
+                                    return val + "%";
+                                }
+                            }
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        shadeIntensity: 0.4,
+                        inverseColors: false,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 50, 53, 91]
+                    }
+                },
+                colors: ['#667eea']
+            };
+
+            const occupancyChart = new ApexCharts(document.querySelector("#occupancyRateChart"), occupancyOptions);
+            occupancyChart.render();
+        }
+
+        // Department Performance Chart
+        function initializeDepartmentPerformanceChart() {
+            fetch('/Dashboard/GetDepartmentPerformance')
+                .then(response => response.json())
+                .then(data => {
+                    const departments = data.map(d => d.department);
+                    const revenue = data.map(d => d.revenue);
+                    const patients = data.map(d => d.patients);
+
+                    const options = {
+                        series: [{
+                            name: 'Revenue',
+                            type: 'column',
+                            data: revenue
+                        }, {
+                            name: 'Patients',
+                            type: 'line',
+                            data: patients
+                        }],
+                        chart: {
+                            height: 320,
+                            type: 'line',
+                            toolbar: {
+                                show: false
+                            }
+                        },
+                        stroke: {
+                            width: [0, 4]
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            enabledOnSeries: [1]
+                        },
+                        colors: ['#667eea', '#f59e0b'],
+                        xaxis: {
+                            categories: departments,
+                            labels: {
+                                rotate: -45,
+                                rotateAlways: false,
+                                hideOverlappingLabels: true
+                            }
+                        },
+                        yaxis: [{
+                            title: {
+                                text: 'Revenue (₹)'
+                            },
+                            labels: {
+                                formatter: function (val) {
+                                    return "₹" + (val / 1000).toFixed(0) + "K";
+                                }
+                            }
+                        }, {
+                            opposite: true,
+                            title: {
+                                text: 'Number of Patients'
+                            }
+                        }],
+                        tooltip: {
+                            shared: true,
+                            intersect: false,
+                            theme: 'dark',
+                            y: {
+                                formatter: function (val, opts) {
+                                    if (opts.seriesIndex === 0) {
+                                        return "₹" + val.toLocaleString();
+                                    }
+                                    return val + " patients";
+                                }
+                            }
+                        },
+                        legend: {
+                            horizontalAlign: 'left',
+                            offsetX: 40
+                        }
+                    };
+
+                    const chart = new ApexCharts(document.querySelector("#departmentPerformanceChart"), options);
+                    chart.render();
+                    window.departmentPerformanceChart = chart;
+                });
+        }
+
+        // Age Distribution Chart
+        function initializeAgeDistributionChart() {
+            const ageGroups = @Html.Raw(Json.Serialize(Model.AgeGroups.Select(a => a.AgeGroup)));
+            const patientCounts = @Html.Raw(Json.Serialize(Model.AgeGroups.Select(a => a.PatientCount)));
+
+            const options = {
+                series: patientCounts,
+                chart: {
+                    height: 320,
+                    type: 'donut',
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
+                    }
+                },
+                labels: ageGroups,
+                colors: ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total Patients',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    color: '#373d3f',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val, opts) {
+                        return opts.w.globals.labels[opts.seriesIndex] + ": " + val.toFixed(1) + "%";
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center'
+                },
+                tooltip: {
+                    theme: 'dark',
+                    y: {
+                        formatter: function (val) {
+                            return val + " patients";
+                        }
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            const chart = new ApexCharts(document.querySelector("#ageDistributionChart"), options);
+            chart.render();
+        }
+
+        // Hourly Heatmap Chart
+        function initializeHourlyHeatmap() {
+            fetch('/Dashboard/GetHourlyDistribution')
+                .then(response => response.json())
+                .then(data => {
+                    // Create heatmap data structure
+                    const heatmapData = [];
+                    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+                    // Generate sample data for weekly heatmap (in production, you'd get this from backend)
+                    days.forEach((day, dayIndex) => {
+                        const dayData = {
+                            name: day,
+                            data: []
+                        };
+
+                        for (let hour = 8; hour <= 20; hour++) {
+                            const hourData = data.appointments[data.hours.indexOf(hour)] || 0;
+                            // Simulate variation for different days
+                            const variation = Math.random() * 0.5 + 0.75;
+                            dayData.data.push({
+                                x: hour + ':00',
+                                y: Math.round(hourData * variation)
+                            });
+                        }
+                        heatmapData.push(dayData);
+                    });
+
+                    const options = {
+                        series: heatmapData,
+                        chart: {
+                            height: 280,
+                            type: 'heatmap',
+                            toolbar: {
+                                show: false
+                            }
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        colors: ["#667eea"],
+                        xaxis: {
+                            type: 'category',
+                            categories: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00']
+                        },
+                        plotOptions: {
+                            heatmap: {
+                                shadeIntensity: 0.5,
+                                radius: 0,
+                                useFillColorAsStroke: true,
+                                colorScale: {
+                                    ranges: [{
+                                        from: 0,
+                                        to: 2,
+                                        name: 'Low',
+                                        color: '#e0e7ff'
+                                    }, {
+                                        from: 3,
+                                        to: 5,
+                                        name: 'Medium',
+                                        color: '#a5b4fc'
+                                    }, {
+                                        from: 6,
+                                        to: 8,
+                                        name: 'High',
+                                        color: '#667eea'
+                                    }, {
+                                        from: 9,
+                                        to: 20,
+                                        name: 'Very High',
+                                        color: '#4338ca'
+                                    }]
+                                }
+                            }
+                        },
+                        tooltip: {
+                            theme: 'dark',
+                            y: {
+                                formatter: function (val) {
+                                    return val + " appointments";
+                                }
+                            }
+                        }
+                    };
+
+                    const chart = new ApexCharts(document.querySelector("#hourlyHeatmapChart"), options);
+                    chart.render();
+                });
+        }
+
+        // Revenue Breakdown Chart
+        function initializeRevenueBreakdown() {
+            const options = {
+                series: [{
+                    name: 'Cleared',
+                    data: [@Model.ClearedRevenueThisMonth]
+                }, {
+                    name: 'Pending',
+                    data: [@Model.PendingRevenueThisMonth]
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 280,
+                    stacked: true,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '50%',
+                        borderRadius: 10
+                    }
+                },
+                colors: ['#10b981', '#f59e0b'],
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val) {
+                        return "₹" + (val / 1000).toFixed(0) + "K";
+                    }
+                },
+                xaxis: {
+                    categories: ['@DateTime.Now.ToString("MMMM yyyy")']
+                },
+                yaxis: {
+                    title: {
+                        text: 'Revenue (₹)'
+                    },
+                    labels: {
+                        formatter: function (val) {
+                            return "₹" + (val / 1000).toFixed(0) + "K";
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right'
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    theme: 'dark',
+                    y: {
+                        formatter: function (val) {
+                            return "₹" + val.toLocaleString();
+                        }
+                    }
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#revenueBreakdownChart"), options);
+            chart.render();
+        }
+
+        // Yearly Comparison Chart
+        function initializeYearlyComparison() {
+            fetch('/Dashboard/GetYearlyComparison')
+                .then(response => response.json())
+                .then(data => {
+                    const options = {
+                        series: [{
+                            name: 'Appointments',
+                            type: 'column',
+                            data: data.appointments
+                        }, {
+                            name: 'Revenue',
+                            type: 'line',
+                            data: data.revenue
+                        }],
+                        chart: {
+                            height: 350,
+                            type: 'line',
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        stroke: {
+                            width: [0, 4]
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            enabledOnSeries: [1]
+                        },
+                        colors: ['#667eea', '#10b981'],
+                        xaxis: {
+                            categories: data.months
+                        },
+                        yaxis: [{
+                            title: {
+                                text: 'Number of Appointments'
+                            }
+                        }, {
+                            opposite: true,
+                            title: {
+                                text: 'Revenue (₹)'
+                            },
+                            labels: {
+                                formatter: function (val) {
+                                    return "₹" + (val / 1000).toFixed(0) + "K";
+                                }
+                            }
+                        }],
+                        tooltip: {
+                            shared: true,
+                            intersect: false,
+                            theme: 'dark'
+                        },
+                        legend: {
+                            horizontalAlign: 'left',
+                            offsetX: 40
+                        }
+                    };
+
+                    const chart = new ApexCharts(document.querySelector("#yearlyComparisonChart"), options);
+                    chart.render();
+                    window.yearlyComparisonChart = chart;
+                });
+        }
+
+        // Chart Update Functions
+        function updateAppointmentChart(period) {
+            // Update chart based on period selection
+            const buttons = document.querySelectorAll('.chart-action-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // In production, fetch new data based on period
+            // For now, just animate the existing chart
+            if (window.appointmentTrendsChart) {
+                window.appointmentTrendsChart.updateOptions({
+                    chart: {
+                        animations: {
+                            enabled: true,
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function refreshAppointmentChart() {
+            const btn = event.target.closest('.chart-action-btn');
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i>';
+
+            // Reload chart data
+            setTimeout(() => {
+                initializeAppointmentTrendsChart();
+                btn.innerHTML = '<i class="bx bx-refresh"></i>';
+            }, 1000);
+        }
+
+        function updateDepartmentChart(metric) {
+            const buttons = document.querySelectorAll('.chart-action-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update chart based on metric
+            if (window.departmentPerformanceChart) {
+                // In production, update with new data
+                window.departmentPerformanceChart.updateOptions({
+                    chart: {
+                        animations: {
+                            enabled: true,
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateYearlyChart(metric) {
+            const buttons = document.querySelectorAll('.chart-action-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update chart based on metric
+            if (window.yearlyComparisonChart) {
+                // In production, update with new data
+                window.yearlyComparisonChart.updateOptions({
+                    chart: {
+                        animations: {
+                            enabled: true,
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Refresh Dashboard Data
+        function refreshDashboardData() {
+            // In production, this would fetch fresh data from the server
+            console.log('Refreshing dashboard data...');
+
+            // Add loading state to cards
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.style.opacity = '0.7';
+            });
+
+            // Simulate data refresh
+            setTimeout(() => {
+                document.querySelectorAll('.metric-card').forEach(card => {
+                    card.style.opacity = '1';
+                });
+            }, 1000);
+        }
+
+        // Export Report Function
+        function exportReport() {
+            // Implement export functionality
+            alert('Report export functionality would be implemented here');
+        }
+
+        // Theme Change Event Listener
+        document.addEventListener('themeChanged', function(e) {
+            const isDark = e.detail.theme === 'dark';
+            
+            // Update all charts with new theme
+            ApexCharts.exec(
+                undefined,
+                'updateOptions',
+                {
+                    theme: {
+                        mode: isDark ? 'dark' : 'light'
+                    },
+                    tooltip: {
+                        theme: isDark ? 'dark' : 'light'
+                    },
+                    grid: {
+                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                    }
+                },
+                true
+            );
+        });
+    </script>
+}
+
+@functions {
+    private string GetDepartmentIcon(string departmentName)
+    {
+        var name = departmentName?.ToLower() ?? "";
+        if (name.Contains("cardio")) return "bx-heart";
+        if (name.Contains("neuro")) return "bx-brain";
+        if (name.Contains("ortho")) return "bx-bone";
+        if (name.Contains("pediatric") || name.Contains("child")) return "bx-child";
+        if (name.Contains("emergency")) return "bx-plus-medical";
+        if (name.Contains("surgery") || name.Contains("surgical")) return "bx-injection";
+        if (name.Contains("dental")) return "bx-tooth";
+        if (name.Contains("eye") || name.Contains("ophthal")) return "bx-low-vision";
+        if (name.Contains("radio")) return "bx-scan";
+        if (name.Contains("icu")) return "bx-pulse";
+        if (name.Contains("maternity")) return "bx-female";
+        if (name.Contains("psychiatry")) return "bx-brain";
+        if (name.Contains("dermatology")) return "bx-face";
+        if (name.Contains("oncology")) return "bx-dna";
+        return "bx-clinic";
+    }
+}

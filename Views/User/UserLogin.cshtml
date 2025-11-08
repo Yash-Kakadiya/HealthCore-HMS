@@ -1,0 +1,127 @@
+﻿@using System.Web
+@{
+    Layout = "~/Views/Shared/_Layout_Login.cshtml";
+    ViewData["Title"] = "Login";
+}
+
+@model UserLoginModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - HeathCore</title>
+
+    <!-- SweetAlert2 for themed popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Client-side validation scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 col-md-8 d-flex flex-column align-items-center justify-content-center">
+
+                            <!-- Login Card with Vastly Improved UI -->
+                            <div class="card main-card mb-3 w-100">
+                                <div class="card-body p-2 p-md-2">
+                                    <div class="text-center mb-4">
+                                        <a asp-controller="User" asp-action="UserLogin" class="logo d-flex align-items-center w-auto justify-content-center mb-3">
+                                            <img src="~/assets/img/main-logo.png" alt="HealthCore Logo" style="max-height: 30px;">
+                                            <span class="d-none d-lg-block fs-4 ms-2">HealthCore</span>
+                                        </a>
+                                        <h5 class="card-title pb-0 fs-4">Welcome Back</h5>
+                                        <p class="small text-muted">Enter your credentials to access your account</p>
+                                    </div>
+
+                                    <form class="row g-4 needs-validation" asp-action="UserLogin" asp-controller="User" method="post" novalidate>
+                                        <div class="col-12 form-group" style="animation-delay: 0.1s;">
+                                            <label asp-for="Username" class="form-label">Username/Email</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text themed-input-group-text"><i class="bi bi-person"></i></span>
+                                                <input type="text" asp-for="Username" class="form-control form-control-themed" required placeholder="Enter your username/Email">
+                                            </div>
+                                            <span asp-validation-for="Username" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+
+                                        <div class="col-12 form-group" style="animation-delay: 0.2s;">
+                                            <label asp-for="Password" class="form-label">Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text themed-input-group-text"><i class="bi bi-lock"></i></span>
+                                                <input type="password" asp-for="Password" class="form-control form-control-themed" id="passwordField" required placeholder="Enter your password">
+                                                <button class="btn" type="button" id="togglePassword">
+                                                    <i class="bi bi-eye-slash"></i>
+                                                </button>
+                                            </div>
+                                            <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                                        </div>
+
+                                        <!--
+                                            <div class="col-12 form-group d-flex justify-content-center align-items-center" style="animation-delay: 0.3s;">
+                                            <div class="form-check form-switch form-switch-themed">
+                                                <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
+                                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                                            </div>
+                                            @* <a href="#" class="small">Forgot password?</a> *@
+                                        </div>
+                                        -->
+
+                                        <div class="col-12 form-group" style="animation-delay: 0.4s;">
+                                            <button class="btn btn-primary w-100" type="submit">Login</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    @section Scripts {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Password visibility toggle
+                const togglePassword = document.querySelector('#togglePassword');
+                const password = document.querySelector('#passwordField');
+                const eyeIcon = togglePassword.querySelector('i');
+
+                togglePassword.addEventListener('click', function (e) {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    eyeIcon.classList.toggle('bi-eye');
+                    eyeIcon.classList.toggle('bi-eye-slash');
+                });
+
+                // Themed SweetAlert for TempData error messages
+                const errorMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(TempData["ErrorMessage"]?.ToString()))';
+                if (errorMessage) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: errorMessage,
+                        background: 'var(--glass-bg)',
+                        color: 'var(--text-color-primary)',
+                        customClass: {
+                            popup: 'main-card' // Reuse the glassmorphism style
+                        },
+                        confirmButtonText: 'Try Again',
+                        confirmButtonColor: 'var(--neon-primary)'
+                    });
+                }
+            });
+        </script>
+    }
+</body>
+</html>
+

@@ -1,0 +1,258 @@
+﻿@model AppointmentModel
+@using HMS.Utils
+@using System.Web
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.AppointmentID == 0 ? "New Appointment" : "Edit Appointment";
+    // Prepare a user-friendly date format for the flatpickr input
+    var appointmentDateValue = Model.AppointmentDate != null ? Model.AppointmentDate.ToString("yyyy-MM-dd HH:mm") : "";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale-1">
+    <title>@ViewData["Title"]</title>
+
+    <!-- Flatpickr for a modern date/time picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card-header-custom {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header-custom h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--text-color-primary);
+                text-shadow: 0 0 8px var(--neon-primary);
+            }
+
+        /* Themed form controls */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all var(--transition-speed);
+        }
+
+            .form-control::placeholder {
+                color: var(--text-color-secondary);
+                opacity: 0.7;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background: var(--glass-bg);
+                border-color: var(--neon-primary);
+                box-shadow: 0 0 10px var(--neon-primary);
+                color: var(--text-color-primary);
+            }
+
+
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='var(--text-color-secondary)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+        }
+
+        /* Staggered animation for form groups */
+        .form-row > .col-md-6 {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .card-footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <div class="card main-card col-xl-8 mx-auto">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-calendar2-plus-fill me-2"></i> @ViewData["Title"]</h5>
+                <a asp-action="AppointmentList" asp-controller="Appointment" class="btn btn-sm btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" asp-controller="Appointment" asp-action="AppointmentAddEdit" id="appointmentForm">
+                    <input type="hidden" asp-for="AppointmentID" />
+
+                    <div class="row g-4 form-row">
+                        <!-- Column 1 -->
+                        <div class="col-md-6" style="animation-delay: 0.1s;">
+                            <label asp-for="PatientID" class="form-label">Select Patient</label>
+                            <select asp-for="PatientID" class="form-select" asp-items="@(new SelectList(ViewBag.PatientList, "PatientID", "PatientName"))" required>
+                                <option value="" selected>-- Select Patient --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6" style="animation-delay: 0.2s;">
+                            <label asp-for="DoctorID" class="form-label">Assign Doctor</label>
+                            <select asp-for="DoctorID" class="form-select" asp-items="@(new SelectList(ViewBag.DoctorList, "DoctorID", "DoctorName"))" required>
+                                <option value="" selected>-- Select Doctor --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12" style="animation-delay: 0.2s;">
+                            <label asp-for="UserID" class="form-label">Assign Doctor</label>
+                            <select asp-for="UserID" class="form-select" asp-items="@(new SelectList(ViewBag.UserList, "UserID", "UserName"))" required>
+                                <option value="" selected>-- Select User --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12" style="animation-delay: 0.3s;">
+                            <label asp-for="AppointmentDate" class="form-label">Appointment Date & Time</label>
+                            <input asp-for="AppointmentDate" class="form-control" placeholder="Select Date and Time" value="@appointmentDateValue" required />
+                        </div>
+
+                        <div class="col-md-6" style="animation-delay: 0.4s;">
+                            <label asp-for="AppointmentStatus" class="form-label">Appointment Status</label>
+                            <select asp-for="AppointmentStatus" class="form-select" required>
+                                <option value="">-- Select Status 📋--</option>
+                                <option value="Pending">Pending ⏳</option>
+                                <option value="Confirmed">Confirmed ✔️</option>
+                                <option value="Cancelled">Cancelled ✖️</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6" style="animation-delay: 0.5s;">
+                            <label asp-for="TotalConsultedAmount" class="form-label">Consultation Fee (₹)</label>
+                            <input type="number" step="0.01" asp-for="TotalConsultedAmount" class="form-control" placeholder="Enter amount" />
+                        </div>
+
+                        <div class="col-md-12" style="animation-delay: 0.6s;">
+                            <label asp-for="Description" class="form-label">Description / Reason for Visit</label>
+                            <textarea required asp-for="Description" class="form-control" rows="3" placeholder="e.g., General checkup, follow-up for fever..."></textarea>
+                        </div>
+
+                        <div class="col-md-12" style="animation-delay: 0.7s;">
+                            <label asp-for="SpecialRemarks" class="form-label">Special Remarks</label>
+                            <input asp-for="SpecialRemarks" class="form-control" placeholder="e.g., Patient is allergic to..." required />
+                        </div>
+
+                        <!-- Hidden field for UserID, assuming it's the current logged-in user -->
+                        <input type="hidden" asp-for="UserID" value="@Model.UserID" />
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer-actions">
+                <a asp-action="AppointmentList" asp-controller="Appointment" class="btn btn-secondary">Cancel</a>
+                <button type="submit" form="appointmentForm" class="btn btn-primary">
+                    <i class="bi bi-check2-circle me-1"></i> @(Model.AppointmentID == 0 ? "Create Appointment" : "Save Changes")
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // --- Razor to sessionStorage Bridge ---
+            // This C# code runs on the server to move the message from TempData into a script tag
+            // that places it in the browser's sessionStorage.
+            @{
+                                            var successMessage = TempData["SuccessMessage"]?.ToString();
+                                            var errorMessage = TempData["ErrorMessage"]?.ToString();
+
+                                            if (!string.IsNullOrEmpty(successMessage))
+                                            {
+                                                                            <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                                            }
+                                            if (!string.IsNullOrEmpty(errorMessage))
+                                            {
+                                                                            <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                                            }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // --- SWEETALERT THEMED TOAST ---
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                        const popup = Swal.getPopup();
+                        if(popup) {
+                            popup.style.background = 'var(--glass-bg)';
+                            popup.style.backdropFilter = 'blur(10px)';
+                            popup.style.border = '1px solid var(--glass-border)';
+                            popup.style.color = 'var(--text-color-primary)';
+                        }
+                    }
+                });
+
+                // --- MESSAGE HANDLING (from sessionStorage) ---
+                const successMsg = sessionStorage.getItem('hms_successMessage');
+                if (successMsg) {
+                    Toast.fire({ icon: 'success', title: successMsg });
+                    sessionStorage.removeItem('hms_successMessage');
+                }
+
+                const errorMsg = sessionStorage.getItem('hms_errorMessage');
+                if (errorMsg) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An Error Occurred',
+                        text: errorMsg,
+                    });
+                    sessionStorage.removeItem('hms_errorMessage');
+                }
+
+                // --- Initialize Flatpickr for a modern date & time selection experience ---
+                flatpickr("input[name='AppointmentDate']", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i", // Format for the backend
+                    altInput: true,
+                    altFormat: "F j, Y at h:i K", // User-friendly format
+                    minDate: "today"
+                });
+            });
+        </script>
+    }
+</body>
+</html>

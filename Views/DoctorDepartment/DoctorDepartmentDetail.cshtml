@@ -1,0 +1,279 @@
+﻿@model DataRow
+@using System.Data
+@using HMS.Utils
+@using System.Web
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // --- Data Preparation ---
+    var doctorDepartmentId = Model["DoctorID"]?.ToString() ?? "0";
+    var enDoctorDepartmentId = HttpUtility.UrlEncode(UrlEncryptDecrypt.Encrypt(doctorDepartmentId));
+
+    var departmentName = Model["DepartmentName"]?.ToString() ?? "N/A";
+    var doctorName = Model["DoctorName"]?.ToString() ?? "N/A";
+    var userName = Model["userName"]?.ToString() ?? "N/A";
+    DateTime? created = Model["Created"] != DBNull.Value ? Convert.ToDateTime(Model["Created"]) : (DateTime?)null;
+    DateTime? modified = Model["Modified"] != DBNull.Value ? Convert.ToDateTime(Model["Modified"]) : (DateTime?)null;
+    ViewData["Title"] = $"{departmentName} - Details";
+}
+@*
+    Model Properties from Stored Procedure PR_Department_SelectByID:
+    DepartmentID, DepartmentName, Description, IsActive, Created, Modified, UserName
+*@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <!-- SweetAlert2 for beautiful popups (needed for delete confirmation) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* --- Styles copied from the approved DoctorDetail.cshtml for perfect consistency --- */
+        .profile .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .profile .profile-header {
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile .profile-icon-wrapper {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--neon-primary);
+            box-shadow: 0 0 15px var(--neon-primary), 0 0 25px rgba(10, 239, 255, 0.5);
+            animation: fadeIn 0.6s 0.1s ease-in-out backwards;
+            color: var(--neon-primary);
+            font-size: 3.5rem;
+        }
+
+        .profile .profile-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color-primary);
+            text-shadow: 0 0 8px var(--neon-primary);
+            animation: fadeIn 0.6s 0.2s ease-in-out backwards;
+        }
+
+        .profile .status-badge {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 0.5em 1em;
+            font-size: 0.9rem;
+            animation: fadeIn 0.6s 0.3s ease-in-out backwards;
+            border-radius: 20px;
+            border-width: 1px;
+            border-style: solid;
+        }
+
+        .status-active {
+            background-color: rgba(0, 255, 156, 0.15);
+            color: var(--neon-secondary);
+            border-color: var(--neon-secondary);
+        }
+
+        .status-inactive {
+            background-color: rgba(139, 148, 158, 0.15);
+            color: var(--text-color-secondary);
+            border-color: var(--text-color-secondary);
+        }
+
+        .details-wrapper {
+            max-width: 900px;
+            margin: 1.5rem auto 0 auto;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+            .detail-item .icon {
+                font-size: 1.5rem;
+                color: var(--neon-primary);
+                margin-top: 5px;
+                flex-shrink: 0;
+            }
+
+            .detail-item .label {
+                font-weight: 500;
+                color: var(--text-color-secondary);
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .detail-item .value {
+                font-weight: 600;
+                color: var(--text-color-primary);
+                font-size: 1rem;
+                word-break: break-all;
+            }
+
+        .card-footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <section class="profile">
+            <div class="card main-card">
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- --- Refined Profile Header --- -->
+                    <div class="profile-header d-flex flex-column align-items-center text-center">
+                        <div class="profile-icon-wrapper d-flex align-items-center justify-content-center mb-3">
+                            <i class="bi bi-diagram-3-fill"></i>
+                        </div>
+                        <h2 class="mb-2">@departmentName</h2>
+
+                    </div>
+
+                    <!-- --- Unified & Centered Details Section --- -->
+                    <div class="details-wrapper">
+                        <!-- Row 1: Doctor Name -->
+                        <div class="row justify-content-center g-4 mb-4">
+                            <div class="col-lg-6">
+                                <div class="detail-item">
+                                    <i class="bi bi-card-text icon"></i>
+                                    <div>
+                                        <div class="label">Department Name</div>
+                                        <div class="value">@departmentName</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="detail-item">
+                                    <i class="bi bi-card-text icon"></i>
+                                    <div>
+                                        <div class="label">Doctor Name</div>
+                                        <div class="value">@doctorName</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Metadata -->
+                        <div class="row justify-content-center g-4">
+                            <div class="col-lg-4">
+                                <div class="detail-item">
+                                    <i class="bi bi-person-check-fill icon"></i>
+                                    <div>
+                                        <div class="label">Record Managed By</div>
+                                        <div class="value">@userName</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="detail-item">
+                                    <i class="bi bi-calendar-plus icon"></i>
+                                    <div>
+                                        <div class="label">Created Date</div>
+                                        <div class="value">@(created.HasValue? created.Value.ToString("dd MMM yyyy, hh:mm tt") : "-")</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="detail-item">
+                                    <i class="bi bi-calendar-check icon"></i>
+                                    <div>
+                                        <div class="label">Last Modified</div>
+                                        <div class="value">@(modified.HasValue? modified.Value.ToString("dd MMM yyyy, hh:mm tt") : "Never")</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- --- Action Buttons Footer --- -->
+                <div class="card-footer-actions">
+                    <a class="btn btn-secondary" asp-controller="DoctorDepartment" asp-action="DoctorDepartmentList" title="Back to List">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                    </a>
+                    <a class="btn btn-primary" asp-controller="DoctorDepartment" asp-action="DoctorDepartmentAddEdit" asp-route-enDoctorDepartmentID="@enDoctorDepartmentId" title="Edit DoctorDepartment">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                    </a>
+                    <a class="btn btn-danger" href="javascript:void(0);" onclick="confirmDelete('@enDoctorDepartmentId')" title="Delete Department">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    @section Scripts {
+        <script>
+            // This Razor block moves TempData to sessionStorage to prevent the back-button bug.
+            @{
+                                                                var successMessage = TempData["SuccessMessage"]?.ToString();
+                                                                var errorMessage = TempData["ErrorMessage"]?.ToString();
+                                                                if (!string.IsNullOrEmpty(successMessage))
+                                                                {
+                                                                                                                    <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                                                                }
+                                                                if (!string.IsNullOrEmpty(errorMessage))
+                                                                {
+                                                                                                                    <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                                                                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // --- SWEETALERT & MESSAGE HANDLING ---
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); const popup = Swal.getPopup(); if(popup){ popup.style.background='var(--glass-bg)'; popup.style.backdropFilter='blur(10px)'; popup.style.border='1px solid var(--glass-border)'; popup.style.color='var(--text-color-primary)'; } } });
+                const successMsg = sessionStorage.getItem('hms_successMessage'); if (successMsg) { Toast.fire({ icon: 'success', title: successMsg }); sessionStorage.removeItem('hms_successMessage'); }
+                const errorMsg = sessionStorage.getItem('hms_errorMessage'); if (errorMsg) { Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMsg }); sessionStorage.removeItem('hms_errorMessage'); }
+
+                // --- INITIALIZE TOOLTIPS ---
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+            });
+
+            // --- GLOBAL DELETE FUNCTION ---
+            function confirmDelete(doctorDepartmentId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("DoctorDepartmentDelete", "Department")?enDoctorDepartmentID=' + doctorDepartmentId;
+                    }
+                });
+            }
+        </script>
+    }
+</body>
+</html>
+

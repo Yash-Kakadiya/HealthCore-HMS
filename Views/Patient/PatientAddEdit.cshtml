@@ -1,0 +1,278 @@
+﻿@model PatientModel
+@using HMS.Utils
+@using System.Web
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.PatientID == 0 ? "Add New Patient" : "Edit Patient Record";
+    // Prepare a user-friendly date format for the flatpickr input
+    var dateOfBirthValue = Model.DateOfBirth != default ? Model.DateOfBirth.ToString("yyyy-MM-dd") : "";
+}
+@*
+    Model Properties for reference:
+    public int PatientID { get; set; }
+    public string PatientName { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public string Gender { get; set; }
+    public string Email { get; set; }
+    public string Phone { get; set; }
+    public string Address { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    public bool IsActive { get; set; }
+    public int UserID { get; set; }
+*@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <!-- SweetAlert2 for beautiful popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Flatpickr for a modern date picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card-header-custom {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header-custom h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--text-color-primary);
+                text-shadow: 0 0 8px var(--neon-primary);
+            }
+
+        /* Themed form controls */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all var(--transition-speed);
+        }
+
+            .form-control::placeholder {
+                color: var(--text-color-secondary);
+                opacity: 0.7;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background: var(--glass-bg);
+                border-color: var(--neon-primary);
+                box-shadow: 0 0 10px var(--neon-primary);
+                color: var(--text-color-primary);
+            }
+
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='var(--text-color-secondary)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+        }
+
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .card-footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .form-switch-themed {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 0;
+        }
+
+            .form-switch-themed .form-check-input {
+                width: 3.5em;
+                height: 1.75em;
+                margin-left: 0;
+                cursor: pointer;
+                background-color: rgba(139, 148, 158, 0.5);
+                border-color: var(--glass-border);
+            }
+
+                .form-switch-themed .form-check-input:checked {
+                    background-color: var(--neon-secondary);
+                    border-color: var(--neon-secondary);
+                    box-shadow: 0 0 10px var(--neon-secondary);
+                }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <div class="card main-card col-xl-8 mx-auto">
+            <div class="card-header-custom">
+                <h5><i class="bi bi-person-hearts me-2"></i> @ViewData["Title"]</h5>
+                <a asp-action="PatientList" asp-controller="Patient" class="btn btn-sm btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form id="patientForm" method="post" asp-controller="Patient" asp-action="PatientAddEdit">
+                    <input type="hidden" asp-for="PatientID" />
+
+                    <!-- Using a reliable Bootstrap row/col grid -->
+                    <div class="row g-4">
+                        <!-- Personal Details -->
+                        <div class="col-md-12 form-group" style="animation-delay: 0.1s;">
+                            <label asp-for="PatientName" class="form-label">Full Name</label>
+                            <input type="text" asp-for="PatientName" class="form-control" placeholder="e.g., John Doe" required />
+                            <span asp-validation-for="PatientName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group" style="animation-delay: 0.2s;">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" class="form-control" placeholder="Select Date" value="@dateOfBirthValue" required />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group" style="animation-delay: 0.3s;">
+                            <label asp-for="Gender" class="form-label">Gender</label>
+                            <select asp-for="Gender" class="form-select" required>
+                                <option value="" selected disabled>-- Select Gender --</option>
+                                <option value="Male">Male ♂️</option>
+                                <option value="Female">Female ♀️</option>
+                                <option value="Other">Other ⚧️</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="col-md-6 form-group" style="animation-delay: 0.4s;">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input type="email" asp-for="Email" class="form-control" placeholder="e.g., patient@example.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group" style="animation-delay: 0.5s;">
+                            <label asp-for="Phone" class="form-label">Phone Number</label>
+                            <input type="tel" asp-for="Phone" class="form-control" placeholder="e.g., 9876543210" pattern="[0-9]{10}" required />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <!-- Address Details -->
+                        <div class="col-md-12 form-group" style="animation-delay: 0.6s;">
+                            <label asp-for="Address" class="form-label">Residential Address</label>
+                            <textarea required asp-for="Address" class="form-control" rows="3" placeholder="e.g., 123 Main Street"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group" style="animation-delay: 0.7s;">
+                            <label asp-for="City" class="form-label">City</label>
+                            <input type="text" asp-for="City" class="form-control" placeholder="e.g., Rajkot" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group" style="animation-delay: 0.8s;">
+                            <label asp-for="State" class="form-label">State</label>
+                            <input type="text" asp-for="State" class="form-control" placeholder="e.g., Gujarat" />
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12 form-group" style="animation-delay: 0.9s;">
+                            <label asp-for="UserID" class="form-label">Record Managed By</label>
+                            <select asp-for="UserID" class="form-select" asp-items="@(new SelectList(ViewBag.UserList, "UserID", "UserName"))" required>
+                                <option value="" selected disabled>-- Select User --</option>
+                            </select>
+                            <span asp-validation-for="UserID" class="text-danger"></span>
+                        </div>
+
+                        <!-- Status Toggle -->
+                        <div class="col-12 form-group" style="animation-delay: 1.0s;">
+                            <div class="form-check form-switch form-switch-themed mt-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="isActiveSwitch" asp-for="IsActive">
+                                <label class="form-check-label" for="isActiveSwitch">Patient is Active?</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- --- Form Footer with Actions --- -->
+            <div class="card-footer-actions">
+                <a asp-action="PatientList" asp-controller="Patient" class="btn btn-secondary">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </a>
+                <button type="submit" form="patientForm" class="btn btn-primary">
+                    <i class="bi bi-check2-circle me-1"></i> @(Model.PatientID == 0 ? "Add Patient" : "Save Changes")
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // This Razor block moves TempData to sessionStorage to prevent the back-button bug.
+            @{
+                                                var successMessage = TempData["SuccessMessage"]?.ToString();
+                                                var errorMessage = TempData["ErrorMessage"]?.ToString();
+                                                if (!string.IsNullOrEmpty(successMessage))
+                                                {
+                                                                                    <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                                                }
+                                                if (!string.IsNullOrEmpty(errorMessage))
+                                                {
+                                                                                    <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                                                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // --- SWEETALERT & MESSAGE HANDLING ---
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); const popup = Swal.getPopup(); if(popup){ popup.style.background='var(--glass-bg)'; popup.style.backdropFilter='blur(10px)'; popup.style.border='1px solid var(--glass-border)'; popup.style.color='var(--text-color-primary)'; } } });
+                const successMsg = sessionStorage.getItem('hms_successMessage'); if (successMsg) { Toast.fire({ icon: 'success', title: successMsg }); sessionStorage.removeItem('hms_successMessage'); }
+                const errorMsg = sessionStorage.getItem('hms_errorMessage'); if (errorMsg) { Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMsg }); sessionStorage.removeItem('hms_errorMessage'); }
+
+                // --- Initialize Flatpickr for a modern date selection experience ---
+                flatpickr("input[name='DateOfBirth']", {
+                    altInput: true,
+                    altFormat: "F j, Y",
+                    dateFormat: "Y-m-d",
+                    maxDate: "today"
+                });
+            });
+        </script>
+    }
+</body>
+</html>
+

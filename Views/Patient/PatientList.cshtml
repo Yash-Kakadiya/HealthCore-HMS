@@ -1,0 +1,240 @@
+﻿@model System.Data.DataTable
+@using HMS.Utils
+@using System.Web
+@{
+    ViewData["Title"] = "Manage Patients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- SweetAlert2 for beautiful popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="~/assets/css/list.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid my-4 px-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 page-header">
+            <h2 class="m-0">Manage Patients</h2>
+            <div class="d-flex align-items-center mt-3 mt-md-0 action-bar">
+                <button class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                    <i class="bi bi-trash-fill me-1"></i> Delete Selected
+                </button>
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="patientSearch" class="form-control" placeholder="Search patients...">
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end glass-effect" aria-labelledby="exportDropdown">
+                        <li><a class="dropdown-item" asp-action="ExportPatients" asp-route-exportType="excel"><i class="bi bi-file-earmark-excel me-2"></i>Export to Excel</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportPatients" asp-route-exportType="pdf"><i class="bi bi-file-earmark-pdf me-2"></i>Export to PDF</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportPatients" asp-route-exportType="csv"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export to CSV</a></li>
+                    </ul>
+                </div>
+                <a asp-action="PatientAddEdit" asp-controller="Patient" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Add Patient
+                </a>
+            </div>
+        </div>
+
+        <div class="card main-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="text-start">
+                            <tr>
+                                <th class="ps-4 text-center" style="width: 5%;"><input class="form-check-input" type="checkbox" id="selectAllCheckbox"></th>
+                                <th style="width: 35%;">Patient</th>
+                                <th style="width: 20%;">Mobile No</th>
+                                <th class="text-center" style="width: 15%;">Status</th>
+                                <th class="text-center pe-4" style="width: 25%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Rows.Count > 0)
+                            {
+                                var colors = new[] { "#0d6efd", "#6f42c1", "#198754", "#d63384", "#fd7e14", "#20c997" };
+                                var colorIndex = 0;
+
+                                foreach (System.Data.DataRow row in Model.Rows)
+                                {
+
+                                    colorIndex++;
+                                    @* var patientId = @UrlEncryptDecrypt.Encrypt(row["PatientID"].ToString()); *@
+                                    var patientId = HttpUtility.UrlEncode(UrlEncryptDecrypt.Encrypt(row["PatientID"].ToString()));
+
+                                    var patientName = row["PatientName"].ToString();
+                                    var avatarChar = string.IsNullOrEmpty(patientName) ? "" : patientName.Substring(0, 1).ToUpper();
+                                    var avatarBg = colors[colorIndex % colors.Length];
+                                    bool isActive = row.Table.Columns.Contains("IsActive") && row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"]);
+
+                                    <tr class="clickable-row" style="animation-delay: @(colorIndex * 0.05)s" onclick="window.location.href='@Url.Action("PatientDetail", "Patient", new { enPatientID = patientId })'">
+                                        <td class="text-center ps-4" onclick="event.stopPropagation();">
+                                            <input class="form-check-input patient-checkbox" type="checkbox" value="@patientId">
+                                        </td>
+                                        <td class="ps-4">
+                                            <div class="patient-info">
+                                                @{
+                                                    var profileImagePath = row.Table.Columns.Contains("ProfileImage") ? row["ProfileImage"].ToString() : string.Empty;
+                                                }
+                                                @if (!string.IsNullOrEmpty(profileImagePath))
+                                                {
+                                                    <img src="~/@Url.Content(profileImagePath)" alt="@patientName" class="patient-avatar" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="patient-avatar" style="background-color:@avatarBg">@avatarChar</div>
+                                                }
+                                                <div>
+                                                    <div class="patient-name">@patientName</div>
+                                                    <div class="patient-email">@row["Email"]</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@row["Phone"]</td>
+                                        <td class="text-center">
+                                            @if (isActive)
+                                            {
+                                                <span class="badge rounded-pill status-active">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge rounded-pill status-inactive">Inactive</span>
+                                            }
+                                        </td>
+                                        <td class="pe-4">
+                                            <div class="action-buttons text-center" onclick="event.stopPropagation();">
+                                                <a class="btn btn-sm btn-outline-primary btn-icon"
+                                                   asp-controller="Patient" asp-action="PatientAddEdit" asp-route-enPatientID="@patientId"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-outline-danger btn-icon"
+                                                   href="javascript:void(0);"
+                                                   onclick="confirmDelete('@patientId')"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="bi bi-person-rolodex"></i>
+                                            <h5>No Patients Found</h5>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        <script>
+            // --- Razor to sessionStorage Bridge ---
+            @{
+                                    var successMessage = TempData["SuccessMessage"]?.ToString();
+                                    var errorMessage = TempData["ErrorMessage"]?.ToString();
+                                    if (!string.IsNullOrEmpty(successMessage))
+                                    {
+                                                    <text>sessionStorage.setItem('hms_successMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(successMessage))');</text>
+                                }
+                                    if (!string.IsNullOrEmpty(errorMessage))
+                                    {
+
+                                                        <text>sessionStorage.setItem('hms_errorMessage', '@Html.Raw(HttpUtility.JavaScriptStringEncode(errorMessage))');</text>
+                                    }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); const popup = Swal.getPopup(); if(popup){ popup.style.background='var(--glass-bg)'; popup.style.backdropFilter='blur(10px)'; popup.style.border='1px solid var(--glass-border)'; popup.style.color='var(--text-color-primary)'; } } });
+                const successMsg = sessionStorage.getItem('hms_successMessage'); if (successMsg) { Toast.fire({ icon: 'success', title: successMsg }); sessionStorage.removeItem('hms_successMessage'); }
+                const errorMsg = sessionStorage.getItem('hms_errorMessage'); if (errorMsg) { Swal.fire({ icon: 'error', title: 'An Error Occurred', text: errorMsg }); sessionStorage.removeItem('hms_errorMessage'); }
+
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+
+                document.getElementById('patientSearch').addEventListener('keyup', function() {
+                    let filter = this.value.toLowerCase();
+                    document.querySelectorAll('tbody tr.clickable-row').forEach(row => {
+                        let name = row.querySelector('.patient-name').textContent.toLowerCase();
+                        let email = row.querySelector('.patient-email').textContent.toLowerCase();
+                        row.style.display = (name.includes(filter) || email.includes(filter)) ? '' : 'none';
+                    });
+                });
+
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                const patientCheckboxes = document.querySelectorAll('.patient-checkbox');
+                const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+                function toggleDeleteButton() {
+                    const checkedCount = document.querySelectorAll('.patient-checkbox:checked').length;
+                    deleteSelectedBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                }
+
+                selectAllCheckbox.addEventListener('change', (e) => {
+                    patientCheckboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+                    toggleDeleteButton();
+                });
+
+                patientCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        selectAllCheckbox.checked = [...patientCheckboxes].every(c => c.checked);
+                        toggleDeleteButton();
+                    });
+                });
+
+                deleteSelectedBtn.addEventListener('click', () => {
+                    const selectedIds = [...patientCheckboxes].filter(c => c.checked).map(c => c.value);
+                    Swal.fire({ title: 'Delete Selected Patients?', text: `You are about to delete ${selectedIds.length} patients.`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete them!' })
+                        .then((result) => {
+                            if (result.isConfirmed) {
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '@Url.Action("DeleteSelectedPatients", "Patient")';
+                                selectedIds.forEach(id => {
+                                    const input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = 'selectedPatientIds';
+                                    input.value = id;
+                                    form.appendChild(input);
+                                });
+                                document.body.appendChild(form);
+                                form.submit();
+                            }
+                        });
+                });
+            });
+
+            function confirmDelete(patientId) {
+                Swal.fire({ title: 'Are you sure?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!' })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '@Url.Action("PatientDelete", "Patient")?enPatientID=' + patientId;
+                        }
+                    });
+            }
+        </script>
+    }
+</body>
+</html>

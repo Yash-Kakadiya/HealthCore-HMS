@@ -1,0 +1,246 @@
+﻿@using HMS.Utils
+@using System.Web
+@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- SweetAlert2 for beautiful popups -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <link href="~/assets/css/list.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container-fluid my-4 px-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 page-header">
+            <h2 class="m-0">Manage Users</h2>
+            <div class="d-flex align-items-center mt-3 mt-md-0 action-bar">
+                <button class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                    <i class="bi bi-trash-fill me-1"></i> Delete Selected
+                </button>
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="userSearch" class="form-control" placeholder="Search users...">
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end glass-effect" aria-labelledby="exportDropdown">
+                        <li><a class="dropdown-item" asp-action="ExportUsers" asp-route-exportType="excel"><i class="bi bi-file-earmark-excel me-2"></i>Export to Excel</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportUsers" asp-route-exportType="pdf"><i class="bi bi-file-earmark-pdf me-2"></i>Export to PDF</a></li>
+                        <li><a class="dropdown-item" asp-action="ExportUsers" asp-route-exportType="csv"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export to CSV</a></li>
+                    </ul>
+                </div>
+                <a asp-action="UserAddEdit" asp-controller="User" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Add User
+                </a>
+            </div>
+        </div>
+
+        <div class="card main-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="text-start">
+                            <tr>
+                                <th class="ps-4 text-center" style="width: 5%;"><input class="form-check-input" type="checkbox" id="selectAllCheckbox"></th>
+                                <th style="width: 35%;">User</th>
+                                <th style="width: 20%;">Mobile No</th>
+                                <th class="text-center" style="width: 15%;">Status</th>
+                                <th class="text-center pe-4" style="width: 25%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Rows.Count > 0)
+                            {
+                                var colors = new[] { "#0d6efd", "#6f42c1", "#198754", "#d63384", "#fd7e14", "#20c997" };
+                                var colorIndex = 0;
+
+                                foreach (System.Data.DataRow row in Model.Rows)
+                                {
+
+                                    colorIndex++;
+                                    @* var userId = @UrlEncryptDecrypt.Encrypt(row["UserID"].ToString()); *@
+                                    var userId = HttpUtility.UrlEncode(UrlEncryptDecrypt.Encrypt(row["UserID"].ToString()));
+
+                                    var userName = row["UserName"].ToString();
+                                    var avatarChar = string.IsNullOrEmpty(userName) ? "" : userName.Substring(0, 1).ToUpper();
+                                    var avatarBg = colors[colorIndex % colors.Length];
+                                    bool isActive = row.Table.Columns.Contains("IsActive") && row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"]);
+
+                                    <tr class="clickable-row" style="animation-delay: @(colorIndex * 0.05)s" onclick="window.location.href='@Url.Action("UserDetail", "User", new { enUserID = userId })'">
+                                        <td class="text-center ps-4" onclick="event.stopPropagation();">
+                                            <input class="form-check-input user-checkbox" type="checkbox" value="@userId">
+                                        </td>
+                                        <td class="ps-4">
+                                            <div class="user-info">
+                                                @{
+                                                    var profileImagePath = row.Table.Columns.Contains("ProfileImage") ? row["ProfileImage"].ToString() : string.Empty;
+                                                }
+                                                @if (!string.IsNullOrEmpty(profileImagePath))
+                                                {
+                                                    <img src="~/@Url.Content(profileImagePath)" alt="@userName" class="user-avatar" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="user-avatar" style="background-color:@avatarBg">@avatarChar</div>
+                                                }
+                                                <div>
+                                                    <div class="user-name">@userName</div>
+                                                    <div class="user-email">@row["Email"]</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@row["MobileNo"]</td>
+                                        <td class="text-center">
+                                            @if (isActive)
+                                            {
+                                                <span class="badge rounded-pill status-active">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge rounded-pill status-inactive">Inactive</span>
+                                            }
+                                        </td>
+                                        <td class="pe-4">
+                                            <div class="action-buttons text-center" onclick="event.stopPropagation();">
+                                                <a class="btn btn-sm btn-outline-primary btn-icon"
+                                                   asp-controller="User" asp-action="UserAddEdit" asp-route-enUserID="@userId"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                <a class="btn btn-sm btn-outline-danger btn-icon"
+                                                   href="javascript:void(0);"
+                                                   onclick="confirmDelete('@userId')"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="bi bi-person-rolodex"></i>
+                                            <h5>No Users Found</h5>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+
+            // --- All frontend logic runs after the page is loaded ---
+            document.addEventListener('DOMContentLoaded', function () {
+
+                // --- USER LIST SPECIFIC LOGIC (Your existing code) ---
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+
+                document.getElementById('userSearch').addEventListener('keyup', function() {
+                    let filter = this.value.toLowerCase();
+                    let rows = document.querySelectorAll('tbody tr.clickable-row');
+                    rows.forEach(row => {
+                        let name = row.querySelector('.user-name').textContent.toLowerCase();
+                        let email = row.querySelector('.user-email').textContent.toLowerCase();
+                        if (name.includes(filter) || email.includes(filter)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                const userCheckboxes = document.querySelectorAll('.user-checkbox');
+                const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+                function toggleDeleteButton() {
+                    const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+                    deleteSelectedBtn.style.display = checkedCount > 0 ? 'inline-flex' : 'none';
+                }
+
+                selectAllCheckbox.addEventListener('change', (e) => {
+                    userCheckboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+                    toggleDeleteButton();
+                });
+
+                userCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        const allChecked = [...userCheckboxes].every(c => c.checked);
+                        const noneChecked = [...userCheckboxes].every(c => !c.checked);
+                        if(allChecked) { selectAllCheckbox.checked = true; selectAllCheckbox.indeterminate = false; }
+                        else if(noneChecked) { selectAllCheckbox.checked = false; selectAllCheckbox.indeterminate = false; }
+                        else { selectAllCheckbox.checked = false; selectAllCheckbox.indeterminate = true; }
+                        toggleDeleteButton();
+                    });
+                });
+
+                deleteSelectedBtn.addEventListener('click', () => {
+                    const selectedIds = [...userCheckboxes].filter(c => c.checked).map(c => c.value);
+                    Swal.fire({
+                        title: 'Delete Selected Users?',
+                        text: `You are about to delete ${selectedIds.length} users. This action cannot be undone.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete them!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '@Url.Action("DeleteSelectedUsers", "User")';
+                            selectedIds.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'selectedUserIds';
+                                input.value = id;
+                                form.appendChild(input);
+                            });
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // --- GLOBAL SINGLE DELETE FUNCTION ---
+            function confirmDelete(userId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("UserDelete", "User")?enUserID=' + userId;
+                    }
+                });
+            }
+        </script>
+    }
+</body>
+</html>

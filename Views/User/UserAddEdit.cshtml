@@ -1,0 +1,375 @@
+﻿@model UserModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.UserID == 0 ? "Add New User" : "Edit User";
+    var profileImage = Model.ProfileImagePath;
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+    
+    <style>
+        /* All styles use the main theme's variables for consistency */
+        
+        .form-container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .form-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .form-card-header {
+            background: rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 1.5rem;
+        }
+
+        .form-card-header h5 {
+            color: var(--text-color-primary);
+            text-shadow: 0 0 8px var(--neon-primary);
+            margin: 0;
+        }
+        
+        /* Form Input Styling */
+        .form-label {
+            color: var(--text-color-secondary);
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            transition: all var(--transition-speed);
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(0,0,0,0.3);
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 10px var(--neon-primary);
+            color: var(--text-color-primary);
+        }
+        .form-control::placeholder { color: var(--text-color-secondary); opacity: 0.7; }
+
+        /* Password with Toggle */
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper .form-control {
+            padding-right: 40px;
+        }
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-color-secondary);
+            transition: color var(--transition-speed);
+        }
+        .password-toggle:hover {
+            color: var(--neon-primary);
+        }
+
+        /* Custom File Input with Image Preview */
+        .profile-image-upload {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px dashed var(--glass-border);
+            background-color: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--text-color-secondary);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all var(--transition-speed);
+        }
+        .profile-image-upload:hover {
+            border-color: var(--neon-primary);
+            color: var(--neon-primary);
+        }
+        .profile-image-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+        }
+        .profile-image-upload .upload-icon {
+            font-size: 2rem;
+        }
+        .profile-image-upload input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* IsActive Toggle Switch */
+        .form-switch .form-check-input {
+            width: 3.5em;
+            height: 1.75em;
+            cursor: pointer;
+            background-color: var(--glass-border);
+            border-color: var(--glass-border);
+        }
+        .form-switch .form-check-input:checked {
+            background-color: var(--neon-secondary);
+            border-color: var(--neon-secondary);
+            box-shadow: 0 0 10px var(--neon-secondary);
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .btn-submit {
+            box-shadow: 0 0 10px var(--neon-secondary);
+        }
+        .btn-back {
+            background-color: var(--sidebar-link-active-bg);
+            border-color: var(--glass-border);
+            color: var(--text-color-primary);
+        }
+
+        .form-group-animated {
+            animation: fadeIn 0.5s ease-out backwards;
+        }
+        
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card-header-custom {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header-custom h5 {
+                margin: 0;
+                font-weight: 600;
+                color: var(--text-color-primary);
+                text-shadow: 0 0 8px var(--neon-primary);
+            }
+
+        /* Themed form controls */
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all var(--transition-speed);
+        }
+
+            .form-control::placeholder {
+                color: var(--text-color-secondary);
+                opacity: 0.7;
+            }
+
+            .form-control:focus, .form-select:focus {
+                background: var(--glass-bg);
+                border-color: var(--neon-primary);
+                box-shadow: 0 0 10px var(--neon-primary);
+                color: var(--text-color-primary);
+            }
+
+        [data-theme="dark"] .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='var(--text-color-secondary)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+        }
+
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .card-footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .form-switch-themed {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-left: 0;
+        }
+
+            .form-switch-themed .form-check-input {
+                width: 3.5em;
+                height: 1.75em;
+                margin-left: 0;
+                cursor: pointer;
+                background-color: rgba(139, 148, 158, 0.5);
+                border-color: var(--glass-border);
+            }
+
+                .form-switch-themed .form-check-input:checked {
+                    background-color: var(--neon-secondary);
+                    border-color: var(--neon-secondary);
+                    box-shadow: 0 0 10px var(--neon-secondary);
+                }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid my-4 px-4 form-container">
+        <div class="card form-card">
+            <div class="card-header form-card-header d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-person-plus-fill me-2"></i> @ViewData["Title"]</h5>
+                <a asp-controller="User" asp-action="UserList" class="btn btn-sm btn-back">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" asp-controller="User" asp-action="UserAddEdit" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="UserID" />
+                    
+                    <div class="row g-4">
+                        <div class="col-md-12 text-center form-group-animated" style="animation-delay: 0.1s;">
+                            <label class="form-label d-block mb-2">Profile Image</label>
+                            <div class="profile-image-upload mx-auto">
+                                <img id="imagePreview" 
+                                    src="~/@(string.IsNullOrEmpty(profileImage) ? "" : Url.Content(profileImage))" alt="Profile Preview" style="@(string.IsNullOrEmpty(profileImage) ? "display:none;" : "")" 
+                                    />
+                                <div id="uploadPlaceholder">
+                                    <i class="bi bi-camera-fill upload-icon"></i>
+                                    <div>Upload</div>
+                                </div>
+                                <input asp-for="ProfileImage" type="file" accept="image/*" onchange="previewImage(event)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 form-group-animated" style="animation-delay: 0.2s;">
+                            <label asp-for="UserName" class="form-label"><i class="bi bi-person me-1"></i> User Name</label>
+                            <input type="text" asp-for="UserName" class="form-control" placeholder="Enter full name" required/>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group-animated" style="animation-delay: 0.3s;">
+                            <label asp-for="Password" class="form-label"><i class="bi bi-shield-lock me-1"></i> Password</label>
+                            <div class="password-wrapper">
+                                <input type="text" asp-for="Password" id="passwordField" class="form-control" placeholder="Enter password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[&#64;$!%*?&]).{8,}" title="Must contain at least one number, one uppercase, one lowercase, one special character, and at least 8 characters."  />
+                                <i class="bi bi-eye-slash password-toggle" id="passwordToggle"></i>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group-animated" style="animation-delay: 0.4s;">
+                            <label asp-for="Email" class="form-label"><i class="bi bi-envelope-at me-1"></i> Email</label>
+                            <input type="email" asp-for="Email" class="form-control" placeholder="e.g., user@example.com" required />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 form-group-animated" style="animation-delay: 0.5s;">
+                            <label asp-for="MobileNo" class="form-label"><i class="bi bi-telephone me-1"></i> Mobile No</label>
+                            <input type="text" asp-for="MobileNo" class="form-control" placeholder="Enter 10-digit number" pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number." required />
+                            <span asp-validation-for="MobileNo" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-12 form-group" style="animation-delay: 0.6s;">
+                            <div class="form-check form-switch form-switch-themed mt-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="isActiveSwitch" asp-for="IsActive">
+                                <label class="form-check-label" for="isActiveSwitch">User is Active?</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" style="border-color: var(--glass-border);">
+
+                    <div class="form-actions form-group-animated" style="animation-delay: 0.7s;">
+                        <button type="submit" class="btn btn-success btn-submit">
+                            <i class="bi bi-check-circle me-1"></i> @(Model.UserID == 0 ? "Add User" : "Save Changes")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    @section Scripts {
+        <script>
+            // --- Image Preview Logic ---
+            function previewImage(event) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const output = document.getElementById('imagePreview');
+                    output.src = reader.result;
+                    output.style.display = 'block';
+                    document.getElementById('uploadPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            }
+
+            // --- Password Toggle Logic ---
+            document.getElementById('passwordToggle').addEventListener('click', function() {
+                const passwordField = document.getElementById('passwordField');
+                const icon = this;
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    passwordField.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
+            });
+        </script>
+    }
+</body>
+</html>
+
