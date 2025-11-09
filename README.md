@@ -38,7 +38,7 @@ or
 ---
 📂 Project Structure
 Here is a high-level overview of the project's folder structure.
-
+```
 HealthCore-HMS/
 ├── Controllers/       # Handles all HTTP requests and business logic
 ├── HMS_DB/            # Contains all .sql scripts for database setup
@@ -60,6 +60,7 @@ HealthCore-HMS/
 ├── Program.cs         # Main application entry point (service registration)
 ├── README.md          # This file
 └── HMS.sln            # Visual Studio solution file
+```
 ---
 ## ⚡ Feature Spotlight: Real-time Group Chat with SignalR
 
