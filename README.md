@@ -36,8 +36,10 @@ or
 * **Modern UI/UX:** A clean, responsive interface built with **Bootstrap 5**, featuring a **Dark Mode / Light Mode** toggle and non-intrusive toast notifications for user actions.
 
 ---
-📂 Project Structure
+## 📂 Project Structure
+
 Here is a high-level overview of the project's folder structure.
+
 ```
 HealthCore-HMS/
 ├── Controllers/       # Handles all HTTP requests and business logic
