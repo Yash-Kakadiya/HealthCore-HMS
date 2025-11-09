@@ -23,7 +23,7 @@ namespace HMS.Controllers
 {
     // The namespace declaration indicates that this code is part of the HMS.Controllers namespace.
     // The UserController class is defined within the HMS.Controllers namespace, which is a common practice in ASP.NET Core applications to organize controllers.
-    //[CheckAccess]
+    
     public class UserController : Controller
     {
         // The UserController class is a controller in an ASP.NET Core application that handles user-related actions.
@@ -121,7 +121,6 @@ namespace HMS.Controllers
         [CheckAccess]
         // This action method retrieves a list of users from the database and returns it to the UserList view.
 
-        //[CheckAccess]
         [HttpGet] // This attribute indicates that this method should handle HTTP GET requests.
         public IActionResult UserList() // This method handles GET requests to the UserList action.
         {

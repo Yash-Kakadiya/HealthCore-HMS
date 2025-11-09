@@ -1,13 +1,25 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\\u00A5@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\",
+  "WorkspaceRootPath": "D:\\01. Github\\HealthCore-HMS\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\\u00A5@$#\\backup\\asp.net core\\project\\final\\project(hospital management system)\\hms\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\01. github\\healthcore-hms\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|solutionrelative:controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\01. github\\healthcore-hms\\utils\\commonvariable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|solutionrelative:utils\\commonvariable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\01. github\\healthcore-hms\\views\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|solutionrelative:views\\dashboard\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\01. github\\healthcore-hms\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\\u00A5@$#\\backup\\asp.net core\\project\\final\\project(hospital management system)\\hms\\views\\doctor\\doctordetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|d:\\01. github\\healthcore-hms\\views\\doctor\\doctordetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{DEFAF850-3904-480B-8769-BF9FEA2313CE}|HMS.csproj|solutionrelative:views\\doctor\\doctordetail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -18,30 +30,68 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DoctorDetail.cshtml",
-              "DocumentMoniker": "D:\\\u00A5@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\Views\\Doctor\\DoctorDetail.cshtml",
-              "RelativeDocumentMoniker": "Views\\Doctor\\DoctorDetail.cshtml",
-              "ToolTip": "D:\\\u00A5@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\Views\\Doctor\\DoctorDetail.cshtml",
-              "RelativeToolTip": "Views\\Doctor\\DoctorDetail.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMEAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-31T05:38:59.3Z",
+              "DocumentIndex": 0,
+              "Title": "DashboardController.cs",
+              "DocumentMoniker": "D:\\01. Github\\HealthCore-HMS\\Controllers\\DashboardController.cs",
+              "RelativeDocumentMoniker": "Controllers\\DashboardController.cs",
+              "ToolTip": "D:\\01. Github\\HealthCore-HMS\\Controllers\\DashboardController.cs*",
+              "RelativeToolTip": "Controllers\\DashboardController.cs*",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T02:29:42.58Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "CommonVariable.cs",
+              "DocumentMoniker": "D:\\01. Github\\HealthCore-HMS\\Utils\\CommonVariable.cs",
+              "RelativeDocumentMoniker": "Utils\\CommonVariable.cs",
+              "ToolTip": "D:\\01. Github\\HealthCore-HMS\\Utils\\CommonVariable.cs",
+              "RelativeToolTip": "Utils\\CommonVariable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-09T02:28:48.947Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\01. Github\\HealthCore-HMS\\Views\\Dashboard\\Index.cshtml",
+              "RelativeDocumentMoniker": "Views\\Dashboard\\Index.cshtml",
+              "ToolTip": "D:\\01. Github\\HealthCore-HMS\\Views\\Dashboard\\Index.cshtml",
+              "RelativeToolTip": "Views\\Dashboard\\Index.cshtml",
+              "ViewState": "AgIAAAIFAAAAAAAAAAD4vw8FAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-09T02:25:50.308Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DoctorDetail.cshtml",
+              "DocumentMoniker": "D:\\01. Github\\HealthCore-HMS\\Views\\Doctor\\DoctorDetail.cshtml",
+              "RelativeDocumentMoniker": "Views\\Doctor\\DoctorDetail.cshtml",
+              "ToolTip": "D:\\01. Github\\HealthCore-HMS\\Views\\Doctor\\DoctorDetail.cshtml",
+              "RelativeToolTip": "Views\\Doctor\\DoctorDetail.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMEAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-31T05:38:59.3Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\\u00A5@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\Program.cs",
+              "DocumentMoniker": "D:\\01. Github\\HealthCore-HMS\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\\u00A5@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\Program.cs",
+              "ToolTip": "D:\\01. Github\\HealthCore-HMS\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-31T05:32:33.705Z",
               "EditorCaption": ""

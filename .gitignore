@@ -1,0 +1,69 @@
+# Dumps
+*.dmp
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.doc
+*.log
+*.mdf
+*.ldf
+*.rpt
+*.[Cc]ache
+*.orig
+*~
+UpgradeLog*.XML
+
+# Output
+[Bb]in/
+[Oo]bj/
+[Rr]elease/
+[Dd]ebug/
+
+# Packages
+packages/
+*.nupkg
+*.snupkg
+
+# User-specific files
+*.secrets.json
+appsettings.Development.json
+
+# Tooling
+project.lock.json
+project.assets.json
+
+# Environment files
+.env
+
+# Rider
+.idea/
+*.sln.iml
+
+# Mac
+.DS_Store
+
+# wwwroot content
+wwwroot/lib/
+
+# Visual Studio temporary files
+*.VC.db
+*.VC.VC.opendb
+
+# Publish output
+/publish/
+/out/
+/logs/
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# IIS
+.vspscc
+*.dbmdl
+
+# ASP.NET scaffolding
+ScaffoldingReadMe.txt

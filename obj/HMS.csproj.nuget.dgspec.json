@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj": {}
+    "D:\\01. Github\\HealthCore-HMS\\HMS.csproj": {}
   },
   "projects": {
-    "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj": {
+    "D:\\01. Github\\HealthCore-HMS\\HMS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj",
+        "projectUniqueName": "D:\\01. Github\\HealthCore-HMS\\HMS.csproj",
         "projectName": "HMS",
-        "projectPath": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj",
+        "projectPath": "D:\\01. Github\\HealthCore-HMS\\HMS.csproj",
         "packagesPath": "C:\\Users\\YASH\\.nuget\\packages\\",
-        "outputPath": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\obj\\",
+        "outputPath": "D:\\01. Github\\HealthCore-HMS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

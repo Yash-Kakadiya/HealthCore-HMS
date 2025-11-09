@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mEVs5pTJQ18=",
+  "dgSpecHash": "+VgnD+MocEk=",
   "success": true,
-  "projectFilePath": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj",
+  "projectFilePath": "D:\\01. Github\\HealthCore-HMS\\HMS.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\YASH\\.nuget\\packages\\bouncycastle.cryptography\\2.4.0\\bouncycastle.cryptography.2.4.0.nupkg.sha512",
     "C:\\Users\\YASH\\.nuget\\packages\\closedxml\\0.105.0\\closedxml.0.105.0.nupkg.sha512",
@@ -48,9 +48,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'iTextSharp 5.5.13.4' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
-      "projectPath": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj",
+      "projectPath": "D:\\01. Github\\HealthCore-HMS\\HMS.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\¥@$#\\Backup\\ASP.Net Core\\Project\\Final\\Project(Hospital Management System)\\HMS\\HMS.csproj",
+      "filePath": "D:\\01. Github\\HealthCore-HMS\\HMS.csproj",
       "libraryId": "iTextSharp",
       "targetGraphs": [
         "net8.0"
