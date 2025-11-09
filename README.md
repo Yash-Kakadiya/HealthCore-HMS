@@ -14,7 +14,7 @@ HealthCore is a comprehensive, data-driven Hospital Management System (HMS) buil
 
 Click below GIF to watch the full system walkthrough video 👇
 
-<a href="https://drive.google.com/file/d/1F7bn5GGBvKolZCyMcBUZfSyGEP531Bi-/view?usp=sharing">
+<a href="https://drive.google.com/file/d/1F7bn5GGBvKolZCyMcBUZfSyGEP531Bi-/view?usp=sharing" target="_blank">
   <img src="healthcore.gif" alt="HealthCore Demo Video" width="800">
 </a>
 <br/>
@@ -144,7 +144,7 @@ To get a local copy up and running, follow these simple steps.
 
    ```json
    "ConnectionStrings": {
-     "MyCon": "Server=YOUR_SERVER_NAME; Database=HMS_DB; Trusted_Connection=True; TrustServerCertificate=True;"
+     "MyConnectionString": "Data Source=YOUR_SERVER_NAME;Initial Catalog=HMS_DB;Integrated Security=true;Encrypt=false"
    }
    ```
 
@@ -165,9 +165,12 @@ To get a local copy up and running, follow these simple steps.
 
 ## 👨‍💻 Author
 
-**Yash Kakadiya**
+**Yash Kakadiya** 
+<br/>
 💼 Computer Science Student | AI & Business Innovation Enthusiast
-📍 Rajkot, Gujarat, India
+<br/>
+📍 Rajkot, Gujarat, India 
+<br/>
 🔗 [GitHub Profile](https://github.com/Yash-Kakadiya)
 
 ---
