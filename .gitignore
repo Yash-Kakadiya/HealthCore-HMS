@@ -45,7 +45,7 @@ project.assets.json
 .DS_Store
 
 # wwwroot content
-wwwroot/lib/
+wwwroot/vendor/ 
 
 # Visual Studio temporary files
 *.VC.db

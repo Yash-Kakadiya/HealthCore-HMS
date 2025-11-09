@@ -17,6 +17,7 @@ Click below GIF to watch the full system walkthrough video 👇
 <a href="https://drive.google.com/file/d/1F7bn5GGBvKolZCyMcBUZfSyGEP531Bi-/view?usp=sharing">
   <img src="healthcore.gif" alt="HealthCore Demo Video" width="800">
 </a>
+<br/>
 or
 
 **[▶ Click here to Watch the Full Demo on Google Drive](https://drive.google.com/file/d/1F7bn5GGBvKolZCyMcBUZfSyGEP531Bi-/view?usp=sharing)**
@@ -35,7 +36,31 @@ or
 * **Modern UI/UX:** A clean, responsive interface built with **Bootstrap 5**, featuring a **Dark Mode / Light Mode** toggle and non-intrusive toast notifications for user actions.
 
 ---
+📂 Project Structure
+Here is a high-level overview of the project's folder structure.
 
+HealthCore-HMS/
+├── Controllers/       # Handles all HTTP requests and business logic
+├── HMS_DB/            # Contains all .sql scripts for database setup
+├── Hubs/              # SignalR hub for real-time chat
+├── Models/            # C# classes representing data (ViewModels)
+├── Properties/        # launchSettings.json (IIS/Kestrel configs)
+├── Utils/             # Custom utility classes (e.g., CheckAccess filter)
+├── Views/             # All .cshtml files (HTML templates)
+│   ├── Shared/        # _Layout.cshtml and other shared views
+│   └── ...            # Folders for each controller
+├── wwwroot/           # All static assets (CSS, JS, images)
+│   ├── assets/        # Custom project CSS, JS, and images
+│   ├── Profile/       # Default location for user uploads
+│   └── vendor/        # [Ignored] Third-party libraries (Bootstrap, etc.)
+├── .gitignore         # Specifies files/folders for Git to ignore
+├── appsettings.json   # Configuration (e.g., ConnectionString)
+├── HMS.csproj         # Project file (dependencies, .NET version)
+├── LICENSE.md         # MIT License file
+├── Program.cs         # Main application entry point (service registration)
+├── README.md          # This file
+└── HMS.sln            # Visual Studio solution file
+---
 ## ⚡ Feature Spotlight: Real-time Group Chat with SignalR
 
 A standout feature of HealthCore is its built-in, real-time group chat for administrators.
