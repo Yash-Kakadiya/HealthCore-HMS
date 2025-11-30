@@ -136,7 +136,7 @@
                         </div>
 
                         <div class="col-md-12" style="animation-delay: 0.2s;">
-                            <label asp-for="UserID" class="form-label">Assign Doctor</label>
+                            <label asp-for="UserID" class="form-label">Assign User</label>
                             <select asp-for="UserID" class="form-select" asp-items="@(new SelectList(ViewBag.UserList, "UserID", "UserName"))" required>
                                 <option value="" selected>-- Select User --</option>
                             </select>
